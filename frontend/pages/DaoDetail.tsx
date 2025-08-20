@@ -688,8 +688,9 @@ export default function DaoDetail() {
         });
       }
 
-      // Appliquer la réponse du serveur pour s'assurer de la cohérence
-      setDao(updatedDao);
+      // Note: On évite de faire setDao ici pour ne pas conflicter avec les mises à jour optimistes debounced
+      // La cohérence sera assurée par le prochain chargement de page
+      console.log(`✅ Task ${taskId} updated successfully on server`);
     } catch (error) {
       console.error("Error updating task:", error);
       setError("Erreur lors de la mise à jour de la tâche");
