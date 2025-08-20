@@ -465,13 +465,13 @@ export default function DaoDetail() {
 
     saveTimeoutRef.current = setTimeout(async () => {
       try {
-        await apiService.updateDao(daoToSave.id, daoToSave);
+        await apiService.updateDao(daoToSave.id, daoToSave, true); // Skip cache invalidation pour optimiser
         console.log(`✅ DAO ${daoToSave.id} saved successfully`);
       } catch (error) {
         console.error("Error saving DAO:", error);
         // En cas d'erreur, on pourrait montrer une notification à l'utilisateur
       }
-    }, 500); // Délai de 500ms
+    }, 300); // Réduit le délai à 300ms pour plus de réactivité
   }, []);
 
   // Load DAO from API
