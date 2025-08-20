@@ -427,7 +427,7 @@ router.put(
   authenticate,
   requireUser,
   auditLog("UPDATE_TASK"),
-  (req, res) => {
+  (req, res): void => {
     try {
       const { id, taskId } = req.params;
 
