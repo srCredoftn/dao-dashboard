@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import type { Dao, DaoTask, TeamMember } from "@shared/dao";
 
 // TeamMember schema
