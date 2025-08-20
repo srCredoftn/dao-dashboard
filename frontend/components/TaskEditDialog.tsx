@@ -47,7 +47,8 @@ export default function TaskEditDialog({
 
     const updates: Partial<DaoTask> = {
       name: taskName.trim(),
-      isApplicable,
+      // N'inclure isApplicable que pour les nouvelles tâches
+      ...(isEditing ? {} : { isApplicable }),
     };
 
     onSave(updates);
