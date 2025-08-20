@@ -338,7 +338,7 @@ export class AuthService {
     user.name = updates.name;
     user.email = updates.email.toLowerCase();
 
-    console.log(`📝 Profile updated for: ${user.email}`);
+    devLog.info(`📝 Profile updated for: ${user.email}`);
     return user;
   }
 
