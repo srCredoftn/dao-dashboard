@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { logger } from "../utils/logger.js";
 
 const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost:27017/dao-management";
@@ -7,11 +8,11 @@ export async function connectToDatabase() {
   try {
     if (mongoose.connection.readyState === 0) {
       await mongoose.connect(MONGODB_URI);
-      console.log("✅ Connected to MongoDB");
+      logger.info("✅ Connected to MongoDB", "DATABASE");
     }
     return mongoose.connection;
   } catch (error) {
-    console.error("❌ MongoDB connection error:", error);
+    logger.error("❌ MongoDB connection error", "DATABASE", error);
     throw error;
   }
 }
