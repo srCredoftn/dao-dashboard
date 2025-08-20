@@ -288,7 +288,7 @@ export class AuthService {
       }
     }
 
-    console.log(`🚫 User deactivated: ${user.email}`);
+    devLog.info(`🚫 User deactivated: ${user.email}`);
     return true;
   }
 
