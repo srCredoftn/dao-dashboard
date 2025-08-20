@@ -1168,7 +1168,7 @@ export default function DaoDetail() {
                   </Button>
                 }
                 title="Supprimer le DAO"
-                description={`��tes-vous sûr de vouloir supprimer le DAO ${dao?.numeroListe} ? Cette action est irréversible.`}
+                description={`Êtes-vous sûr de vouloir supprimer le DAO ${dao?.numeroListe} ? Cette action est irréversible.`}
                 confirmText="Supprimer"
                 onConfirm={handleDelete}
                 disabled={isDeleting}
