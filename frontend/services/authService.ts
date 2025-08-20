@@ -4,7 +4,7 @@ import type {
   AuthUser,
   User,
 } from "@shared/dao";
-import { simpleFetch } from "@/utils/simple-fetch";
+import { simpleFetchV2 as simpleFetch } from "@/utils/simple-fetch-v2";
 
 const API_BASE_URL = "/api/auth";
 
