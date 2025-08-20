@@ -184,7 +184,7 @@ router.post(
   requireAdmin,
   auditLog("CREATE_DAO"),
   sensitiveOperationLimit(),
-  (req, res) => {
+  (req, res): void => {
     try {
       // Validate and sanitize input
       const validatedData = createDaoSchema.parse(req.body);
