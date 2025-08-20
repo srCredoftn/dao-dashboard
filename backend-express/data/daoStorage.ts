@@ -53,7 +53,7 @@ class DaoStorage {
   // Add new DAO
   add(dao: Dao): void {
     this.storage.push(dao);
-    this.rebuildIndexes(); // Rebuild indexes after adding
+    this.rebuildIndexes(true); // Rebuild indexes after adding
   }
 
   // Update DAO at index (optimized)
