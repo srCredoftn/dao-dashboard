@@ -1093,38 +1093,40 @@ export default function DaoDetail() {
             </div>
 
             {/* Second Row: Action buttons */}
-            <div className="flex gap-2">
-              <ExportFilterDialog
-                tasks={dao.tasks}
-                onExport={handleExportWithOptions}
-              >
-                <Button variant="outline" size="sm" className="flex-1">
-                  <Download className="h-4 w-4 mr-1" />
-                  <span className="text-sm">Export</span>
-                </Button>
-              </ExportFilterDialog>
-              <ConfirmationDialog
-                trigger={
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    disabled={isDeleting}
-                    className="flex-1"
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    <span className="text-sm">
-                      {isDeleting ? "Suppression..." : "Supprimer"}
-                    </span>
+            {isAdmin && (
+              <div className="flex gap-2">
+                <ExportFilterDialog
+                  tasks={dao.tasks}
+                  onExport={handleExportWithOptions}
+                >
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Download className="h-4 w-4 mr-1" />
+                    <span className="text-sm">Export</span>
                   </Button>
-                }
-                title="Supprimer le DAO"
-                description={`Êtes-vous sûr de vouloir supprimer le DAO ${dao?.numeroListe} ? Cette action est irréversible.`}
-                confirmText="Supprimer"
-                onConfirm={handleDelete}
-                disabled={isDeleting}
-                icon="trash"
-              />
-            </div>
+                </ExportFilterDialog>
+                <ConfirmationDialog
+                  trigger={
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={isDeleting}
+                      className="flex-1"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      <span className="text-sm">
+                        {isDeleting ? "Suppression..." : "Supprimer"}
+                      </span>
+                    </Button>
+                  }
+                  title="Supprimer le DAO"
+                  description={`Êtes-vous sûr de vouloir supprimer le DAO ${dao?.numeroListe} ? Cette action est irréversible.`}
+                  confirmText="Supprimer"
+                  onConfirm={handleDelete}
+                  disabled={isDeleting}
+                  icon="trash"
+                />
+              </div>
+            )}
           </div>
 
           {/* Desktop Layout */}
