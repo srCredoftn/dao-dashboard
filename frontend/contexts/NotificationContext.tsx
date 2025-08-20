@@ -38,19 +38,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     auth = useAuth();
   } catch (error) {
     console.error("NotificationProvider: Auth context not available", error);
-    // Retourner les enfants sans notification context si auth n'est pas disponible
-    return <>{children}</>;
+    auth = { user: null, isLoading: false };
   }
 
   const { user, isLoading } = auth;
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  // Si l'auth est en cours de chargement, on affiche les enfants sans notifications
-  if (isLoading) {
-    return <>{children}</>;
-  }
-
-  // Subscribe to notification service updates
+  // Subscribe to notification service updates - ALWAYS call hooks in the same order
   useEffect(() => {
     if (!user) return;
 
@@ -69,6 +63,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
     return unsubscribe;
   }, [user]);
+
+  // Handle early returns AFTER all hooks are called
+  if (!user || isLoading) {
+    return <>{children}</>;
+  }
 
   const markAsRead = (notificationId: string) => {
     notificationService.markAsRead(notificationId);
