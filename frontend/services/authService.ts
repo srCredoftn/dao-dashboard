@@ -4,7 +4,7 @@ import type {
   AuthUser,
   User,
 } from "@shared/dao";
-import { simpleFetchV2 as simpleFetch } from "@/utils/simple-fetch-v2";
+// Using native fetch with simpler timeout management
 
 const API_BASE_URL = "/api/auth";
 
