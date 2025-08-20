@@ -305,7 +305,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     userPasswords[user.email] = hashedPassword;
 
-    console.log(`🔑 Password changed for: ${user.email}`);
+    devLog.info(`🔑 Password changed for: ${user.email}`);
     return true;
   }
 
