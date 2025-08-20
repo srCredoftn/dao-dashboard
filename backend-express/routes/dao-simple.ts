@@ -9,7 +9,7 @@ import {
   sensitiveOperationLimit,
 } from "../middleware/auth";
 import { DEFAULT_TASKS } from "@shared/dao";
-import type { Dao, TeamMember, DaoTask } from "@shared/dao";
+import type { Dao } from "@shared/dao";
 
 const router = express.Router();
 
