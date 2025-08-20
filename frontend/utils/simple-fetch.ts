@@ -16,10 +16,18 @@ export class SimpleFetch {
   }
 
   // Créer un timeout pour les requêtes
-  private createTimeoutSignal(timeoutMs: number): AbortSignal {
+  private createTimeoutSignal(timeoutMs: number): { signal: AbortSignal; cleanup: () => void } {
     const controller = new AbortController();
-    setTimeout(() => controller.abort(), timeoutMs);
-    return controller.signal;
+    const timeoutId = setTimeout(() => {
+      if (!controller.signal.aborted) {
+        controller.abort(new Error(`Request timeout after ${timeoutMs}ms`));
+      }
+    }, timeoutMs);
+
+    return {
+      signal: controller.signal,
+      cleanup: () => clearTimeout(timeoutId)
+    };
   }
 
   // Méthode principale de fetch
