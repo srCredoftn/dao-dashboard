@@ -167,10 +167,10 @@ router.get("/:id", authenticate, (req, res) => {
     }
 
     console.log(`📄 Serving DAO ${id} to ${req.user?.email}`);
-    res.json(dao);
+    return res.json(dao);
   } catch (error) {
     console.error("Error in GET /api/dao/:id:", error);
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to fetch DAO",
       code: "FETCH_ERROR",
     });
