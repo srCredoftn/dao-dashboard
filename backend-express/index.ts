@@ -57,7 +57,7 @@ export function createServer() {
     standardHeaders: true,
     legacyHeaders: false,
     // Skip rate limiting pour certains cas en développement
-    skip: (req) => {
+    skip: (_req) => {
       if (process.env.NODE_ENV === "development") {
         // Plus de flexibilité en dev, mais garde une protection minimale
         return false;
@@ -80,11 +80,11 @@ export function createServer() {
   app.use(
     express.json({
       limit: "10mb",
-      verify: (req, res, buf, encoding) => {
+      verify: (_req, _res, buf, encoding) => {
         // Basic JSON structure validation
         if (buf && buf.length) {
           try {
-            JSON.parse(buf.toString(encoding || "utf8"));
+            JSON.parse(buf.toString((encoding as BufferEncoding) || "utf8"));
           } catch (err) {
             const error = new Error("Invalid JSON");
             (error as any).status = 400;
@@ -102,7 +102,7 @@ export function createServer() {
   );
 
   // Security headers
-  app.use((req, res, next) => {
+  app.use((_req, res, next) => {
     res.set({
       "X-Content-Type-Options": "nosniff",
       "X-Frame-Options": "DENY",
@@ -122,7 +122,7 @@ export function createServer() {
   }
 
   // Health check endpoint
-  app.get("/api/health", (req, res) => {
+  app.get("/api/health", (_req, res) => {
     res.json({
       status: "OK",
       timestamp: new Date().toISOString(),
@@ -132,7 +132,7 @@ export function createServer() {
   });
 
   // Example API routes
-  app.get("/api/ping", (req, res) => {
+  app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "pong - secure";
     res.json({ message: ping, timestamp: new Date().toISOString() });
   });
@@ -163,7 +163,7 @@ export function createServer() {
       err: any,
       req: express.Request,
       res: express.Response,
-      next: express.NextFunction,
+      _next: express.NextFunction,
     ) => {
       logger.error(
         "Unhandled error",

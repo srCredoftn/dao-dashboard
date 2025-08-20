@@ -19,10 +19,10 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Identifiants incorrects" });
     }
 
-    res.json(authResponse);
+    return res.json(authResponse);
   } catch (error) {
     console.error("Login error:", error);
-    res.status(401).json({ error: "Identifiants incorrects" });
+    return res.status(401).json({ error: "Identifiants incorrects" });
   }
 });
 
@@ -36,31 +36,31 @@ router.post("/logout", authenticate, async (req, res) => {
       await AuthService.logout(token);
     }
 
-    res.json({ message: "Logged out successfully" });
+    return res.json({ message: "Logged out successfully" });
   } catch (error) {
     console.error("Logout error:", error);
-    res.status(500).json({ error: "Logout failed" });
+    return res.status(500).json({ error: "Logout failed" });
   }
 });
 
 // GET /api/auth/me - Get current user info
 router.get("/me", authenticate, async (req, res) => {
   try {
-    res.json({ user: req.user });
+    return res.json({ user: req.user });
   } catch (error) {
     console.error("Get user info error:", error);
-    res.status(500).json({ error: "Failed to get user info" });
+    return res.status(500).json({ error: "Failed to get user info" });
   }
 });
 
 // GET /api/auth/users - Get all users (admin only)
-router.get("/users", authenticate, requireAdmin, async (req, res) => {
+router.get("/users", authenticate, requireAdmin, async (_req, res) => {
   try {
     const users = await AuthService.getAllUsers();
-    res.json(users);
+    return res.json(users);
   } catch (error) {
     console.error("Get users error:", error);
-    res.status(500).json({ error: "Failed to get users" });
+    return res.status(500).json({ error: "Failed to get users" });
   }
 });
 
@@ -79,14 +79,13 @@ router.post("/users", authenticate, requireAdmin, async (req, res) => {
       name: userData.name,
       email: userData.email,
       role: userData.role,
-      isActive: true,
       password: userData.password, // Pass the password to the service
     });
 
-    res.status(201).json(newUser);
+    return res.status(201).json(newUser);
   } catch (error) {
     console.error("Create user error:", error);
-    res.status(500).json({ error: "Failed to create user" });
+    return res.status(500).json({ error: "Failed to create user" });
   }
 });
 
@@ -105,10 +104,10 @@ router.put("/users/:id/role", authenticate, requireAdmin, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json(updatedUser);
+    return res.json(updatedUser);
   } catch (error) {
     console.error("Update user role error:", error);
-    res.status(500).json({ error: "Failed to update user role" });
+    return res.status(500).json({ error: "Failed to update user role" });
   }
 });
 
@@ -129,10 +128,10 @@ router.delete("/users/:id", authenticate, requireAdmin, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json({ message: "User deactivated successfully" });
+    return res.json({ message: "User deactivated successfully" });
   } catch (error) {
     console.error("Deactivate user error:", error);
-    res.status(500).json({ error: "Failed to deactivate user" });
+    return res.status(500).json({ error: "Failed to deactivate user" });
   }
 });
 
@@ -152,10 +151,10 @@ router.post("/change-password", authenticate, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json({ message: "Password changed successfully" });
+    return res.json({ message: "Password changed successfully" });
   } catch (error) {
     console.error("Change password error:", error);
-    res.status(500).json({ error: "Failed to change password" });
+    return res.status(500).json({ error: "Failed to change password" });
   }
 });
 
@@ -188,13 +187,13 @@ router.put("/profile", authenticate, async (req, res) => {
       role: updatedUser.role,
     };
 
-    res.json(authUser);
+    return res.json(authUser);
   } catch (error) {
     console.error("Update profile error:", error);
-    if (error.message === "Email already exists") {
+    if ((error as Error).message === "Email already exists") {
       return res.status(400).json({ error: "Email already exists" });
     }
-    res.status(500).json({ error: "Failed to update profile" });
+    return res.status(500).json({ error: "Failed to update profile" });
   }
 });
 
@@ -225,15 +224,17 @@ router.post("/forgot-password", async (req, res) => {
     // For development, we'll return the token in the response
     console.log(`📧 Password reset code for ${email}: ${token}`);
 
-    res.json({
+    return res.json({
       message:
-        "Un code de réinitialisation a été envoyé à votre adresse email.",
+        "Un code de réinitialisation a ét�� envoyé à votre adresse email.",
       // Remove this in production - only for development
       developmentToken: token,
     });
   } catch (error) {
     console.error("Forgot password error:", error);
-    res.status(500).json({ error: "Failed to process password reset request" });
+    return res
+      .status(500)
+      .json({ error: "Failed to process password reset request" });
   }
 });
 
@@ -252,10 +253,10 @@ router.post("/verify-reset-token", async (req, res) => {
       return res.status(400).json({ error: "Code invalide ou expiré" });
     }
 
-    res.json({ message: "Code vérifié avec succès" });
+    return res.json({ message: "Code vérifié avec succès" });
   } catch (error) {
     console.error("Verify reset token error:", error);
-    res.status(500).json({ error: "Failed to verify reset token" });
+    return res.status(500).json({ error: "Failed to verify reset token" });
   }
 });
 
@@ -286,10 +287,10 @@ router.post("/reset-password", async (req, res) => {
       return res.status(400).json({ error: "Code invalide ou expiré" });
     }
 
-    res.json({ message: "Mot de passe réinitialisé avec succès" });
+    return res.json({ message: "Mot de passe réinitialisé avec succès" });
   } catch (error) {
     console.error("Reset password error:", error);
-    res.status(500).json({ error: "Failed to reset password" });
+    return res.status(500).json({ error: "Failed to reset password" });
   }
 });
 

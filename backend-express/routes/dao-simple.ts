@@ -9,7 +9,7 @@ import {
   sensitiveOperationLimit,
 } from "../middleware/auth";
 import { DEFAULT_TASKS } from "@shared/dao";
-import type { Dao, TeamMember, DaoTask } from "@shared/dao";
+import type { Dao } from "@shared/dao";
 
 const router = express.Router();
 
@@ -105,7 +105,7 @@ router.get("/next-number", authenticate, (req, res) => {
     // Filter DAOs for current year with safer regex
     const currentYearDaos = daoStorage.filter((dao) => {
       const match = dao.numeroListe.match(/^DAO-(\d{4})-(\d{3})$/);
-      return match && parseInt(match[1], 10) === year;
+      return Boolean(match && parseInt(match[1], 10) === year);
     });
 
     if (currentYearDaos.length === 0) {
@@ -167,10 +167,10 @@ router.get("/:id", authenticate, (req, res) => {
     }
 
     console.log(`📄 Serving DAO ${id} to ${req.user?.email}`);
-    res.json(dao);
+    return res.json(dao);
   } catch (error) {
     console.error("Error in GET /api/dao/:id:", error);
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to fetch DAO",
       code: "FETCH_ERROR",
     });

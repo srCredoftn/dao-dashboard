@@ -1,15 +1,24 @@
-import { vi } from "vitest";
+import { vi, beforeEach, afterEach } from "vitest";
 
 // Mock des variables d'environnement pour les tests
 process.env.JWT_SECRET = "test-jwt-secret-for-testing-purposes-only";
 process.env.NODE_ENV = "test";
 
 // Mock du localStorage pour les tests Node
+const localStorageData: Record<string, string> = {};
 const localStorageMock = {
-  getItem: vi.fn(() => null),
-  setItem: vi.fn(() => null),
-  removeItem: vi.fn(() => null),
-  clear: vi.fn(() => null),
+  getItem: vi.fn((key: string) => localStorageData[key] || null),
+  setItem: vi.fn((key: string, value: string) => {
+    localStorageData[key] = value;
+  }),
+  removeItem: vi.fn((key: string) => {
+    delete localStorageData[key];
+  }),
+  clear: vi.fn(() => {
+    Object.keys(localStorageData).forEach(
+      (key) => delete localStorageData[key],
+    );
+  }),
 };
 
 // Mock global pour localStorage

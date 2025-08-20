@@ -19,7 +19,7 @@ app.get("*", (req, res) => {
     return res.status(404).json({ error: "API endpoint not found" });
   }
 
-  res.sendFile(path.join(distPath, "index.html"));
+  return res.sendFile(path.join(distPath, "index.html"));
 });
 
 app.listen(port, () => {

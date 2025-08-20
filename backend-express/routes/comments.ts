@@ -1,6 +1,6 @@
 import express from "express";
 import { CommentService } from "../services/commentService";
-import { authenticate, requireUser } from "../middleware/auth";
+import { authenticate } from "../middleware/auth";
 
 const router = express.Router();
 
@@ -12,10 +12,10 @@ router.get("/dao/:daoId", authenticate, async (req, res) => {
   try {
     const { daoId } = req.params;
     const comments = await CommentService.getDaoComments(daoId);
-    res.json(comments);
+    return res.json(comments);
   } catch (error) {
     console.error("Error getting DAO comments:", error);
-    res.status(500).json({ error: "Failed to get comments" });
+    return res.status(500).json({ error: "Failed to get comments" });
   }
 });
 
@@ -27,10 +27,10 @@ router.get("/dao/:daoId/task/:taskId", authenticate, async (req, res) => {
       daoId,
       parseInt(taskId),
     );
-    res.json(comments);
+    return res.json(comments);
   } catch (error) {
     console.error("Error getting task comments:", error);
-    res.status(500).json({ error: "Failed to get task comments" });
+    return res.status(500).json({ error: "Failed to get task comments" });
   }
 });
 
@@ -54,10 +54,10 @@ router.post("/", authenticate, async (req, res) => {
     };
 
     const newComment = await CommentService.addComment(commentData);
-    res.status(201).json(newComment);
+    return res.status(201).json(newComment);
   } catch (error) {
     console.error("Error adding comment:", error);
-    res.status(500).json({ error: "Failed to add comment" });
+    return res.status(500).json({ error: "Failed to add comment" });
   }
 });
 
@@ -81,13 +81,13 @@ router.put("/:id", authenticate, async (req, res) => {
       return res.status(404).json({ error: "Comment not found" });
     }
 
-    res.json(updatedComment);
+    return res.json(updatedComment);
   } catch (error) {
     console.error("Error updating comment:", error);
-    if (error.message.includes("Unauthorized")) {
-      return res.status(403).json({ error: error.message });
+    if ((error as Error).message.includes("Unauthorized")) {
+      return res.status(403).json({ error: (error as Error).message });
     }
-    res.status(500).json({ error: "Failed to update comment" });
+    return res.status(500).json({ error: "Failed to update comment" });
   }
 });
 
@@ -106,13 +106,13 @@ router.delete("/:id", authenticate, async (req, res) => {
       return res.status(404).json({ error: "Comment not found" });
     }
 
-    res.json({ message: "Comment deleted successfully" });
+    return res.json({ message: "Comment deleted successfully" });
   } catch (error) {
     console.error("Error deleting comment:", error);
-    if (error.message.includes("Unauthorized")) {
-      return res.status(403).json({ error: error.message });
+    if ((error as Error).message.includes("Unauthorized")) {
+      return res.status(403).json({ error: (error as Error).message });
     }
-    res.status(500).json({ error: "Failed to delete comment" });
+    return res.status(500).json({ error: "Failed to delete comment" });
   }
 });
 
@@ -121,10 +121,10 @@ router.get("/recent", authenticate, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 10;
     const comments = await CommentService.getRecentComments(limit);
-    res.json(comments);
+    return res.json(comments);
   } catch (error) {
     console.error("Error getting recent comments:", error);
-    res.status(500).json({ error: "Failed to get recent comments" });
+    return res.status(500).json({ error: "Failed to get recent comments" });
   }
 });
 

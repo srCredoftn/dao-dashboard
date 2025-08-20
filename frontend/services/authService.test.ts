@@ -42,6 +42,7 @@ describe("AuthService", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(credentials),
+        signal: expect.any(AbortSignal),
       });
 
       expect(result).toEqual(mockResponse);
@@ -68,7 +69,7 @@ describe("AuthService", () => {
       };
 
       await expect(authService.login(credentials)).rejects.toThrow(
-        "Invalid credentials",
+        "Identifiants incorrects, veuillez réessayer",
       );
     });
   });
