@@ -102,7 +102,7 @@ export function createServer() {
   );
 
   // Security headers
-  app.use((req, res, next) => {
+  app.use((_req, res, next) => {
     res.set({
       "X-Content-Type-Options": "nosniff",
       "X-Frame-Options": "DENY",
@@ -122,7 +122,7 @@ export function createServer() {
   }
 
   // Health check endpoint
-  app.get("/api/health", (req, res) => {
+  app.get("/api/health", (_req, res) => {
     res.json({
       status: "OK",
       timestamp: new Date().toISOString(),
@@ -132,7 +132,7 @@ export function createServer() {
   });
 
   // Example API routes
-  app.get("/api/ping", (req, res) => {
+  app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "pong - secure";
     res.json({ message: ping, timestamp: new Date().toISOString() });
   });
