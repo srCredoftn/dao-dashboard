@@ -90,7 +90,7 @@ router.get("/", authenticate, auditLog("VIEW_ALL_DAOS"), (req, res) => {
 });
 
 // GET /api/dao/next-number - Get next DAO number (authenticated users only)
-router.get("/next-number", authenticate, (req, res): void => {
+router.get("/next-number", authenticate, (req, res) => {
   try {
     const year = new Date().getFullYear();
 
@@ -146,7 +146,7 @@ router.get("/next-number", authenticate, (req, res): void => {
 });
 
 // GET /api/dao/:id - Get DAO by ID (authenticated users only)
-router.get("/:id", authenticate, (req, res): void => {
+router.get("/:id", authenticate, (req, res) => {
   try {
     const { id } = req.params;
 
@@ -184,7 +184,7 @@ router.post(
   requireAdmin,
   auditLog("CREATE_DAO"),
   sensitiveOperationLimit(),
-  (req, res): void => {
+  (req, res) => {
     try {
       // Validate and sanitize input
       const validatedData = createDaoSchema.parse(req.body);
@@ -276,7 +276,7 @@ router.put(
   authenticate,
   requireUser,
   auditLog("UPDATE_DAO"),
-  (req, res): void => {
+  (req, res) => {
     try {
       const { id } = req.params;
 
@@ -380,7 +380,7 @@ router.delete(
   requireAdmin,
   auditLog("DELETE_DAO"),
   sensitiveOperationLimit(),
-  (req, res): void => {
+  (req, res) => {
     try {
       const { id } = req.params;
 
@@ -427,7 +427,7 @@ router.put(
   authenticate,
   requireUser,
   auditLog("UPDATE_TASK"),
-  (req, res): void => {
+  (req, res) => {
     try {
       const { id, taskId } = req.params;
 
