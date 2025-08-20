@@ -1,4 +1,4 @@
-import { vi } from "vitest";
+import { vi, beforeEach, afterEach } from "vitest";
 
 // Mock des variables d'environnement pour les tests
 process.env.JWT_SECRET = "test-jwt-secret-for-testing-purposes-only";
