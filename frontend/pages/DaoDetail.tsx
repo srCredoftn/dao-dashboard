@@ -187,7 +187,7 @@ function TaskRow({
               <span className="text-xs text-muted-foreground">Applicable:</span>
               {isAdmin() ? (
                 <Switch
-                  checked={false}
+                  checked={task.isApplicable}
                   onCheckedChange={(checked) =>
                     onApplicableChange(task.id, checked)
                   }
