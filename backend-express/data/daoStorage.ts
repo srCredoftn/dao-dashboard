@@ -54,11 +54,20 @@ class DaoStorage {
     this.rebuildIndexes(); // Rebuild indexes after adding
   }
 
-  // Update DAO at index
+  // Update DAO at index (optimized)
   updateAtIndex(index: number, dao: Dao): void {
     if (index >= 0 && index < this.storage.length) {
+      const oldDao = this.storage[index];
       this.storage[index] = dao;
-      this.rebuildIndexes(); // Rebuild indexes after updating
+
+      // Optimisation: seulement reconstruire les indexes si nécessaire
+      if (oldDao.id !== dao.id || oldDao.autoriteContractante !== dao.autoriteContractante) {
+        this.rebuildIndexes();
+        console.log(`📊 DAO indexes rebuilt: ${this.storage.length} DAOs indexed`);
+      } else {
+        // Pas besoin de reconstruire les indexes pour les mises à jour de contenu
+        console.log(`📝 DAO ${dao.id} updated (indexes preserved)`);
+      }
     }
   }
 
