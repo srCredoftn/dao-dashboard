@@ -1,6 +1,7 @@
 import express from "express";
 import { AuthService } from "../services/authService";
 import { authenticate, requireAdmin } from "../middleware/auth";
+import { authLog, devLog } from "../utils/devLog";
 import type { LoginCredentials } from "@shared/dao";
 
 const router = express.Router();
