@@ -298,7 +298,7 @@ export default function Index() {
           testGlobalStatistics();
         }
       } catch (err) {
-        console.error("Error loading DAOs:", err);
+        devLog.error("Error loading DAOs:", err);
         setError("Failed to load DAOs");
       } finally {
         setLoading(false);
@@ -312,8 +312,8 @@ export default function Index() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.shiftKey && event.key === "T") {
-        console.clear();
-        console.log("��� Exécution des tests de fonctionnalité...\n");
+        devLog.clear();
+        devLog.log("��� Exécution des tests de fonctionnalité...\n");
         runAllTests();
       }
     };
@@ -330,7 +330,7 @@ export default function Index() {
       const createdDao = await apiService.createDao(newDaoData);
       setDaos((prev) => [createdDao, ...prev]);
     } catch (err) {
-      console.error("Error creating DAO:", err);
+      devLog.error("Error creating DAO:", err);
       setError("Failed to create DAO");
     }
   };
