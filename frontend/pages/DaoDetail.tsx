@@ -934,7 +934,7 @@ export default function DaoDetail() {
 
     pdf.setFont("helvetica", "normal");
     const stats = [
-      `• Tâches exportées: ${tasks.length}`,
+      `• Tâches export��es: ${tasks.length}`,
       `• Tâches terminées: ${tasks.filter((t) => t.isApplicable && (t.progress || 0) >= 100).length}`,
       `• Tâches en cours: ${tasks.filter((t) => t.isApplicable && (t.progress || 0) > 0 && (t.progress || 0) < 100).length}`,
       `• Tâches à faire: ${tasks.filter((t) => t.isApplicable && (t.progress || 0) === 0).length}`,
@@ -1093,7 +1093,7 @@ export default function DaoDetail() {
             </div>
 
             {/* Second Row: Action buttons */}
-            {isAdmin && (
+            {isAdmin() && (
               <div className="flex gap-2">
                 <ExportFilterDialog
                   tasks={dao.tasks}
@@ -1153,7 +1153,7 @@ export default function DaoDetail() {
             </div>
 
             <div className="flex items-center gap-3">
-              {isAdmin && (
+              {isAdmin() && (
                 <>
                   <ExportFilterDialog
                     tasks={dao.tasks}
