@@ -128,10 +128,10 @@ router.delete("/users/:id", authenticate, requireAdmin, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json({ message: "User deactivated successfully" });
+    return res.json({ message: "User deactivated successfully" });
   } catch (error) {
     console.error("Deactivate user error:", error);
-    res.status(500).json({ error: "Failed to deactivate user" });
+    return res.status(500).json({ error: "Failed to deactivate user" });
   }
 });
 
@@ -151,10 +151,10 @@ router.post("/change-password", authenticate, async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json({ message: "Password changed successfully" });
+    return res.json({ message: "Password changed successfully" });
   } catch (error) {
     console.error("Change password error:", error);
-    res.status(500).json({ error: "Failed to change password" });
+    return res.status(500).json({ error: "Failed to change password" });
   }
 });
 
@@ -187,13 +187,13 @@ router.put("/profile", authenticate, async (req, res) => {
       role: updatedUser.role,
     };
 
-    res.json(authUser);
+    return res.json(authUser);
   } catch (error) {
     console.error("Update profile error:", error);
-    if (error.message === "Email already exists") {
+    if ((error as Error).message === "Email already exists") {
       return res.status(400).json({ error: "Email already exists" });
     }
-    res.status(500).json({ error: "Failed to update profile" });
+    return res.status(500).json({ error: "Failed to update profile" });
   }
 });
 
