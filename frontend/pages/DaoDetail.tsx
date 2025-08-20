@@ -156,7 +156,7 @@ function TaskRow({
             <div className="flex items-center gap-2">
               {isAdmin() ? (
                 <Switch
-                  checked={false}
+                  checked={task.isApplicable}
                   onCheckedChange={(checked) =>
                     onApplicableChange(task.id, checked)
                   }
