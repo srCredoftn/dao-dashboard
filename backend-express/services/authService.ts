@@ -154,7 +154,7 @@ export class AuthService {
         token,
       };
     } catch (error) {
-      console.error("Login error:", error);
+      devLog.error("Login error:", error);
       return null;
     }
   }
