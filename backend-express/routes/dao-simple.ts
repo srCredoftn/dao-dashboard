@@ -276,7 +276,7 @@ router.put(
   authenticate,
   requireUser,
   auditLog("UPDATE_DAO"),
-  (req, res) => {
+  (req, res): void => {
     try {
       const { id } = req.params;
 
