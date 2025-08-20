@@ -15,7 +15,10 @@ app.listen(PORT, () => {
   logger.info(`  ✅ CORS protection`, "SERVER");
   logger.info(`  ✅ Helmet security headers`, "SERVER");
   logger.info(`  ✅ Audit logging`, "SERVER");
-  logger.info(`📡 API endpoints available at http://localhost:${PORT}/api/`, "SERVER");
+  logger.info(
+    `📡 API endpoints available at http://localhost:${PORT}/api/`,
+    "SERVER",
+  );
 });
 
 // Graceful shutdown

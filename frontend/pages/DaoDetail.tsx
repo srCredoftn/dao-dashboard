@@ -746,10 +746,7 @@ export default function DaoDetail() {
         const freshDao = await apiService.getDaoById(dao.id);
         setDao(freshDao);
       } catch (reloadError) {
-        devLog.error(
-          "Error reloading DAO after failed deletion:",
-          reloadError,
-        );
+        devLog.error("Error reloading DAO after failed deletion:", reloadError);
       }
       setError("Failed to delete task");
     }
