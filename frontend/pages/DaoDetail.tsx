@@ -678,19 +678,6 @@ export default function DaoDetail() {
         };
       });
 
-      // Pour les changements de "applicable", utiliser le debounced save pour éviter les conflicts
-      if (updates.isApplicable !== undefined && Object.keys(updates).length === 1) {
-        const updatedDao = {
-          ...dao,
-          tasks: dao.tasks.map((task) =>
-            task.id === taskId ? { ...task, ...updates } : task,
-          ),
-        };
-        debouncedSave(updatedDao);
-        console.log(`📝 Task ${taskId} applicability updated via dialog (debounced)`);
-        return;
-      }
-
       let updatedDao: Dao;
 
       if (updates.name !== undefined) {
