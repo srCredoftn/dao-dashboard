@@ -310,4 +310,121 @@ router.put("/profile", authenticate, async (req, res) => {
   }
 });
 
+// POST /api/auth/forgot-password - Request password reset
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const validatedData = forgotPasswordSchema.parse(req.body);
+    const email = validatedData.email.toLowerCase();
+
+    // Find user by email
+    const user = await UserModel.findOne({ email, isActive: true });
+
+    // Always return success for security (don't reveal if email exists)
+    const successMessage = "Si cet email existe, un code de réinitialisation a été envoyé.";
+
+    if (!user) {
+      return res.json({ message: successMessage });
+    }
+
+    // Generate reset token (6-digit code)
+    const resetToken = crypto.randomInt(100000, 999999).toString();
+    const resetExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Save reset token to user
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = resetExpires;
+    await user.save();
+
+    // Send email
+    const emailSent = await emailService.sendPasswordResetEmail(email, resetToken);
+
+    console.log(`🔑 Password reset requested for: ${email} (Token: ${resetToken})`);
+
+    res.json({
+      message: "Un code de réinitialisation a été envoyé à votre adresse email.",
+      // For development only - remove in production
+      ...(process.env.NODE_ENV === "development" && !emailSent && { developmentToken: resetToken }),
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        error: "Validation error",
+        details: error.errors,
+      });
+    }
+
+    console.error("Forgot password error:", error);
+    res.status(500).json({ error: "Failed to process password reset request" });
+  }
+});
+
+// POST /api/auth/verify-reset-token - Verify reset token
+router.post("/verify-reset-token", async (req, res) => {
+  try {
+    const validatedData = verifyResetTokenSchema.parse(req.body);
+    const { email, token } = validatedData;
+
+    const user = await UserModel.findOne({
+      email: email.toLowerCase(),
+      isActive: true,
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: "Code invalide ou expiré" });
+    }
+
+    res.json({ message: "Code vérifié avec succès" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        error: "Validation error",
+        details: error.errors,
+      });
+    }
+
+    console.error("Verify reset token error:", error);
+    res.status(500).json({ error: "Failed to verify token" });
+  }
+});
+
+// POST /api/auth/reset-password - Reset password with token
+router.post("/reset-password", async (req, res) => {
+  try {
+    const validatedData = resetPasswordSchema.parse(req.body);
+    const { email, token, newPassword } = validatedData;
+
+    const user = await UserModel.findOne({
+      email: email.toLowerCase(),
+      isActive: true,
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: "Code invalide ou expiré" });
+    }
+
+    // Update password
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    console.log(`🔑 Password reset successful for: ${user.email}`);
+    res.json({ message: "Mot de passe réinitialisé avec succès" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        error: "Validation error",
+        details: error.errors,
+      });
+    }
+
+    console.error("Reset password error:", error);
+    res.status(500).json({ error: "Failed to reset password" });
+  }
+});
+
 export default router;
