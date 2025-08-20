@@ -467,9 +467,9 @@ export default function DaoDetail() {
     saveTimeoutRef.current = setTimeout(async () => {
       try {
         await apiService.updateDao(daoToSave.id, daoToSave, true); // Skip cache invalidation pour optimiser
-        console.log(`✅ DAO ${daoToSave.id} saved successfully`);
+        devLog.log(`✅ DAO ${daoToSave.id} saved successfully`);
       } catch (error) {
-        console.error("Error saving DAO:", error);
+        devLog.error("Error saving DAO:", error);
         // En cas d'erreur, on pourrait montrer une notification à l'utilisateur
       }
     }, 300); // Réduit le délai à 300ms pour plus de réactivité
@@ -490,7 +490,7 @@ export default function DaoDetail() {
         const fetchedDao = await apiService.getDaoById(id);
         setDao(fetchedDao);
       } catch (err) {
-        console.error("Error loading DAO:", err);
+        devLog.error("Error loading DAO:", err);
         const errorMessage =
           err instanceof Error ? err.message : "Échec du chargement du DAO";
 
@@ -500,7 +500,7 @@ export default function DaoDetail() {
           errorMessage.includes("404") ||
           errorMessage.includes("HTTP error! status: 404")
         ) {
-          console.log("DAO not found, redirecting to DAO list...");
+          devLog.log("DAO not found, redirecting to DAO list...");
           // Optionnellement, on pourrait ajouter une notification toast ici
           navigate("/", { replace: true });
           return;
@@ -582,7 +582,7 @@ export default function DaoDetail() {
     // Sauvegarde différée pour éviter trop d'appels API
     debouncedSave(updatedDao);
 
-    console.log(
+    devLog.log(
       `📝 Task ${taskId} progress changed to ${newProgress}% (saving...)`,
     );
   };
@@ -625,7 +625,7 @@ export default function DaoDetail() {
       ),
     });
 
-    console.log(
+    devLog.log(
       `📝 Task ${taskId} applicability changed to ${applicable} (saving...)`,
     );
   };
@@ -657,7 +657,7 @@ export default function DaoDetail() {
       });
       setDao(updatedDao);
     } catch (error) {
-      console.error("Error adding task:", error);
+      devLog.error("Error adding task:", error);
       setError("Failed to add task");
     }
   };
@@ -703,9 +703,9 @@ export default function DaoDetail() {
 
       // Note: On évite de faire setDao ici pour ne pas conflicter avec les mises à jour optimistes debounced
       // La cohérence sera assurée par le prochain chargement de page
-      console.log(`✅ Task ${taskId} updated successfully on server`);
+      devLog.log(`✅ Task ${taskId} updated successfully on server`);
     } catch (error) {
-      console.error("Error updating task:", error);
+      devLog.error("Error updating task:", error);
       setError("Erreur lors de la mise à jour de la tâche");
 
       // Recharger les données en cas d'erreur pour annuler la mise à jour optimiste
@@ -713,7 +713,7 @@ export default function DaoDetail() {
         const freshDao = await apiService.getDaoById(dao.id);
         setDao(freshDao);
       } catch (reloadError) {
-        console.error("Error reloading DAO after failed update:", reloadError);
+        devLog.error("Error reloading DAO after failed update:", reloadError);
       }
     }
   };
@@ -736,9 +736,9 @@ export default function DaoDetail() {
       const result = await taskService.deleteTask(dao.id, taskId);
       setDao(result.dao);
 
-      console.log(`✅ Tâche "${taskToDelete?.name}" supprimée avec succès`);
+      devLog.log(`✅ Tâche "${taskToDelete?.name}" supprimée avec succès`);
     } catch (error) {
-      console.error("Error deleting task:", error);
+      devLog.error("Error deleting task:", error);
       setError("Erreur lors de la suppression de la tâche");
 
       // Recharger les données en cas d'erreur pour annuler la suppression optimiste
@@ -746,7 +746,7 @@ export default function DaoDetail() {
         const freshDao = await apiService.getDaoById(dao.id);
         setDao(freshDao);
       } catch (reloadError) {
-        console.error(
+        devLog.error(
           "Error reloading DAO after failed deletion:",
           reloadError,
         );
@@ -769,7 +769,7 @@ export default function DaoDetail() {
       });
       setDao(updatedDao);
     } catch (error) {
-      console.error("Error updating task assignment:", error);
+      devLog.error("Error updating task assignment:", error);
       setError("Failed to update task assignment");
     }
   };
@@ -983,7 +983,7 @@ export default function DaoDetail() {
         navigate("/");
       }
     } catch (error) {
-      console.error("Erreur lors de la suppression:", error);
+      devLog.error("Erreur lors de la suppression:", error);
     } finally {
       setIsDeleting(false);
     }
