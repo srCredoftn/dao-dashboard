@@ -9,7 +9,7 @@ class DaoStorage {
   private autoriteIndex: Map<string, Dao[]> = new Map();
 
   constructor() {
-    this.rebuildIndexes();
+    this.rebuildIndexes(true);
   }
 
   // Rebuild all indexes
