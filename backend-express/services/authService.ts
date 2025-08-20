@@ -15,8 +15,8 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
 
 // Validation du secret JWT au démarrage
 if (!JWT_SECRET || JWT_SECRET.length < 32) {
-  console.error("🚨 ERREUR CRITIQUE: JWT_SECRET manquant ou trop court");
-  console.error(
+  devLog.error("🚨 ERREUR CRITIQUE: JWT_SECRET manquant ou trop court");
+  devLog.error(
     "   Veuillez définir une variable d'environnement JWT_SECRET de plus de 32 caractères",
   );
   process.exit(1);
