@@ -13,7 +13,7 @@ class DaoStorage {
   }
 
   // Rebuild all indexes
-  private rebuildIndexes(): void {
+  private rebuildIndexes(verbose = false): void {
     this.idIndex.clear();
     this.autoriteIndex.clear();
 
@@ -29,7 +29,9 @@ class DaoStorage {
       this.autoriteIndex.get(autorite)!.push(dao);
     });
 
-    console.log(`📊 DAO indexes rebuilt: ${this.storage.length} DAOs indexed`);
+    if (verbose) {
+      console.log(`📊 DAO indexes rebuilt: ${this.storage.length} DAOs indexed`);
+    }
   }
 
   // Get all DAOs
