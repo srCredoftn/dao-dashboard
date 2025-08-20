@@ -91,14 +91,19 @@ class AuthApiService {
       console.log(`✅ Auth API success: ${url} (${response.status})`);
       return await response.json();
     } catch (error) {
-      if (error.name === 'AbortError') {
+      if (error.name === "AbortError") {
         console.warn(`⏰ Request timeout for ${endpoint}`);
         throw new Error("La requête a pris trop de temps. Veuillez réessayer.");
       }
 
-      if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+      if (
+        error instanceof TypeError &&
+        error.message.includes("Failed to fetch")
+      ) {
         console.warn(`🌐 Network error for ${endpoint}:`, error.message);
-        throw new Error("Impossible de se connecter au serveur. Vérifiez votre connexion internet.");
+        throw new Error(
+          "Impossible de se connecter au serveur. Vérifiez votre connexion internet.",
+        );
       }
 
       console.error(`Auth API request failed for ${endpoint}:`, error);

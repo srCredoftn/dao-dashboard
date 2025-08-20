@@ -40,7 +40,7 @@ export class SimpleFetchV2 {
 
         // Créer un nouveau AbortController pour chaque tentative
         abortController = new AbortController();
-        
+
         // Combiner avec le signal existant si présent
         let finalSignal = abortController.signal;
         if (fetchOptions.signal) {
@@ -68,7 +68,7 @@ export class SimpleFetchV2 {
 
         const response = await Promise.race([
           fetchPromise,
-          ...(timeout > 0 ? [timeoutPromise] : [])
+          ...(timeout > 0 ? [timeoutPromise] : []),
         ]);
 
         // Nettoyer le timeout si la requête réussit
@@ -76,9 +76,10 @@ export class SimpleFetchV2 {
           clearTimeout(timeoutId);
         }
 
-        console.log(`✅ SimpleFetch v2 successful: ${url} (${response.status})`);
+        console.log(
+          `✅ SimpleFetch v2 successful: ${url} (${response.status})`,
+        );
         return response;
-
       } catch (error) {
         // Nettoyer le timeout en cas d'erreur
         if (timeoutId) {
@@ -99,7 +100,8 @@ export class SimpleFetchV2 {
           errorMessage.includes("network") ||
           errorMessage.includes("timeout") ||
           errorMessage.includes("TypeError") ||
-          (errorMessage.includes("AbortError") && !errorMessage.includes("user"));
+          (errorMessage.includes("AbortError") &&
+            !errorMessage.includes("user"));
 
         // Ne pas retry si c'est la dernière tentative ou si l'erreur n'est pas retriable
         if (attempt === maxRetries || !isRetriableError) {
@@ -119,17 +121,19 @@ export class SimpleFetchV2 {
     if (lastError) {
       // Améliorer le message d'erreur selon le type
       let friendlyMessage = lastError.message;
-      
+
       if (lastError.message.includes("timeout")) {
-        friendlyMessage = "La requête a pris trop de temps. Vérifiez votre connexion.";
+        friendlyMessage =
+          "La requête a pris trop de temps. Vérifiez votre connexion.";
       } else if (lastError.message.includes("Failed to fetch")) {
-        friendlyMessage = "Impossible de contacter le serveur. Vérifiez votre connexion internet.";
+        friendlyMessage =
+          "Impossible de contacter le serveur. Vérifiez votre connexion internet.";
       } else if (lastError.message.includes("AbortError")) {
         friendlyMessage = "La requête a été interrompue. Veuillez réessayer.";
       }
 
       const enhancedError = new Error(
-        `${friendlyMessage} (${maxRetries + 1} tentatives)`
+        `${friendlyMessage} (${maxRetries + 1} tentatives)`,
       );
       enhancedError.name = "SimpleFetchError";
       enhancedError.stack = lastError.stack;

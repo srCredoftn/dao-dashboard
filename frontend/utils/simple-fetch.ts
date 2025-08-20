@@ -16,7 +16,10 @@ export class SimpleFetch {
   }
 
   // Créer un timeout pour les requêtes
-  private createTimeoutSignal(timeoutMs: number): { signal: AbortSignal; cleanup: () => void } {
+  private createTimeoutSignal(timeoutMs: number): {
+    signal: AbortSignal;
+    cleanup: () => void;
+  } {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       if (!controller.signal.aborted) {
@@ -26,7 +29,7 @@ export class SimpleFetch {
 
     return {
       signal: controller.signal,
-      cleanup: () => clearTimeout(timeoutId)
+      cleanup: () => clearTimeout(timeoutId),
     };
   }
 
@@ -63,7 +66,9 @@ export class SimpleFetch {
           // Utiliser window.fetch directement pour éviter les problèmes d'iframe
           const response = await window.fetch(url, fetchOptions);
 
-          console.log(`✅ Simple fetch successful: ${url} (${response.status})`);
+          console.log(
+            `✅ Simple fetch successful: ${url} (${response.status})`,
+          );
 
           // Nettoyer le timeout sur succès
           if (timeoutCleanup) {
@@ -85,7 +90,8 @@ export class SimpleFetch {
             errorMessage.includes("Failed to fetch") ||
             errorMessage.includes("network") ||
             errorMessage.includes("timeout") ||
-            (errorMessage.includes("AbortError") && !errorMessage.includes("timeout")) ||
+            (errorMessage.includes("AbortError") &&
+              !errorMessage.includes("timeout")) ||
             errorMessage.includes("TypeError");
 
           // Ne pas retry sur la dernière tentative ou si l'erreur n'est pas retriable
