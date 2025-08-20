@@ -285,10 +285,10 @@ router.post("/reset-password", async (req, res) => {
       return res.status(400).json({ error: "Code invalide ou expiré" });
     }
 
-    res.json({ message: "Mot de passe réinitialisé avec succ��s" });
+    return res.json({ message: "Mot de passe réinitialisé avec succès" });
   } catch (error) {
     console.error("Reset password error:", error);
-    res.status(500).json({ error: "Failed to reset password" });
+    return res.status(500).json({ error: "Failed to reset password" });
   }
 });
 
