@@ -15,8 +15,8 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
 
 // Validation du secret JWT au démarrage
 if (!JWT_SECRET || JWT_SECRET.length < 32) {
-  console.error("🚨 ERREUR CRITIQUE: JWT_SECRET manquant ou trop court");
-  console.error(
+  devLog.error("🚨 ERREUR CRITIQUE: JWT_SECRET manquant ou trop court");
+  devLog.error(
     "   Veuillez définir une variable d'environnement JWT_SECRET de plus de 32 caractères",
   );
   process.exit(1);
@@ -154,7 +154,7 @@ export class AuthService {
         token,
       };
     } catch (error) {
-      console.error("Login error:", error);
+      devLog.error("Login error:", error);
       return null;
     }
   }
@@ -248,7 +248,7 @@ export class AuthService {
     users.push(newUser);
     userPasswords[newUser.email] = hashedPassword;
 
-    console.log(`👤 New user created: ${newUser.email} Role: ${newUser.role}`);
+    devLog.info(`👤 New user created: ${newUser.email} Role: ${newUser.role}`);
     return newUser;
   }
 
@@ -263,7 +263,7 @@ export class AuthService {
     }
 
     user.role = role;
-    console.log(`🔄 User role updated: ${user.email} → ${role}`);
+    devLog.info(`🔄 User role updated: ${user.email} → ${role}`);
     return user;
   }
 
@@ -288,7 +288,7 @@ export class AuthService {
       }
     }
 
-    console.log(`🚫 User deactivated: ${user.email}`);
+    devLog.info(`🚫 User deactivated: ${user.email}`);
     return true;
   }
 
@@ -305,7 +305,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     userPasswords[user.email] = hashedPassword;
 
-    console.log(`🔑 Password changed for: ${user.email}`);
+    devLog.info(`🔑 Password changed for: ${user.email}`);
     return true;
   }
 

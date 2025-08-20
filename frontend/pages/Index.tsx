@@ -22,6 +22,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDaoStats } from "@/hooks/use-dao-stats";
 import { useDaoFilters } from "@/hooks/use-dao-filters";
+import { devLog } from "@/utils/devLogger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -297,7 +298,7 @@ export default function Index() {
           testGlobalStatistics();
         }
       } catch (err) {
-        console.error("Error loading DAOs:", err);
+        devLog.error("Error loading DAOs:", err);
         setError("Failed to load DAOs");
       } finally {
         setLoading(false);
@@ -311,8 +312,8 @@ export default function Index() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.shiftKey && event.key === "T") {
-        console.clear();
-        console.log("��� Exécution des tests de fonctionnalité...\n");
+        devLog.clear();
+        devLog.log("��� Exécution des tests de fonctionnalité...\n");
         runAllTests();
       }
     };
@@ -329,7 +330,7 @@ export default function Index() {
       const createdDao = await apiService.createDao(newDaoData);
       setDaos((prev) => [createdDao, ...prev]);
     } catch (err) {
-      console.error("Error creating DAO:", err);
+      devLog.error("Error creating DAO:", err);
       setError("Failed to create DAO");
     }
   };

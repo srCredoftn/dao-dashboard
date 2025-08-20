@@ -1,6 +1,7 @@
 import express from "express";
 import { AuthService } from "../services/authService";
 import { authenticate, requireAdmin } from "../middleware/auth";
+import { authLog, devLog } from "../utils/devLog";
 import type { LoginCredentials } from "@shared/dao";
 
 const router = express.Router();
@@ -21,7 +22,7 @@ router.post("/login", async (req, res) => {
 
     return res.json(authResponse);
   } catch (error) {
-    console.error("Login error:", error);
+    authLog.login(req.body.email || "unknown", false);
     return res.status(401).json({ error: "Identifiants incorrects" });
   }
 });
@@ -38,7 +39,7 @@ router.post("/logout", authenticate, async (req, res) => {
 
     return res.json({ message: "Logged out successfully" });
   } catch (error) {
-    console.error("Logout error:", error);
+    devLog.error("Logout error:", error);
     return res.status(500).json({ error: "Logout failed" });
   }
 });
@@ -48,7 +49,7 @@ router.get("/me", authenticate, async (req, res) => {
   try {
     return res.json({ user: req.user });
   } catch (error) {
-    console.error("Get user info error:", error);
+    devLog.error("Get user info error:", error);
     return res.status(500).json({ error: "Failed to get user info" });
   }
 });
@@ -59,7 +60,7 @@ router.get("/users", authenticate, requireAdmin, async (_req, res) => {
     const users = await AuthService.getAllUsers();
     return res.json(users);
   } catch (error) {
-    console.error("Get users error:", error);
+    devLog.error("Get users error:", error);
     return res.status(500).json({ error: "Failed to get users" });
   }
 });
@@ -84,7 +85,7 @@ router.post("/users", authenticate, requireAdmin, async (req, res) => {
 
     return res.status(201).json(newUser);
   } catch (error) {
-    console.error("Create user error:", error);
+    devLog.error("Create user error:", error);
     return res.status(500).json({ error: "Failed to create user" });
   }
 });
@@ -106,7 +107,7 @@ router.put("/users/:id/role", authenticate, requireAdmin, async (req, res) => {
 
     return res.json(updatedUser);
   } catch (error) {
-    console.error("Update user role error:", error);
+    devLog.error("Update user role error:", error);
     return res.status(500).json({ error: "Failed to update user role" });
   }
 });
@@ -130,7 +131,7 @@ router.delete("/users/:id", authenticate, requireAdmin, async (req, res) => {
 
     return res.json({ message: "User deactivated successfully" });
   } catch (error) {
-    console.error("Deactivate user error:", error);
+    devLog.error("Deactivate user error:", error);
     return res.status(500).json({ error: "Failed to deactivate user" });
   }
 });
@@ -153,7 +154,7 @@ router.post("/change-password", authenticate, async (req, res) => {
 
     return res.json({ message: "Password changed successfully" });
   } catch (error) {
-    console.error("Change password error:", error);
+    devLog.error("Change password error:", error);
     return res.status(500).json({ error: "Failed to change password" });
   }
 });
@@ -189,7 +190,7 @@ router.put("/profile", authenticate, async (req, res) => {
 
     return res.json(authUser);
   } catch (error) {
-    console.error("Update profile error:", error);
+    devLog.error("Update profile error:", error);
     if ((error as Error).message === "Email already exists") {
       return res.status(400).json({ error: "Email already exists" });
     }
@@ -222,7 +223,7 @@ router.post("/forgot-password", async (req, res) => {
 
     // In production, send email here
     // For development, we'll return the token in the response
-    console.log(`📧 Password reset code for ${email}: ${token}`);
+    devLog.info(`📧 Password reset code generated for ${email}`);
 
     return res.json({
       message:
@@ -231,7 +232,7 @@ router.post("/forgot-password", async (req, res) => {
       developmentToken: token,
     });
   } catch (error) {
-    console.error("Forgot password error:", error);
+    devLog.error("Forgot password error:", error);
     return res
       .status(500)
       .json({ error: "Failed to process password reset request" });
@@ -255,7 +256,7 @@ router.post("/verify-reset-token", async (req, res) => {
 
     return res.json({ message: "Code vérifié avec succès" });
   } catch (error) {
-    console.error("Verify reset token error:", error);
+    devLog.error("Verify reset token error:", error);
     return res.status(500).json({ error: "Failed to verify reset token" });
   }
 });
@@ -289,7 +290,7 @@ router.post("/reset-password", async (req, res) => {
 
     return res.json({ message: "Mot de passe réinitialisé avec succès" });
   } catch (error) {
-    console.error("Reset password error:", error);
+    devLog.error("Reset password error:", error);
     return res.status(500).json({ error: "Failed to reset password" });
   }
 });

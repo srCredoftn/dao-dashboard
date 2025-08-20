@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { logger } from "../utils/logger.js";
 
 const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost:27017/dao-management";
@@ -7,11 +8,11 @@ export async function connectToDatabase() {
   try {
     if (mongoose.connection.readyState === 0) {
       await mongoose.connect(MONGODB_URI);
-      console.log("✅ Connected to MongoDB");
+      logger.info("✅ Connected to MongoDB", "DATABASE");
     }
     return mongoose.connection;
   } catch (error) {
-    console.error("❌ MongoDB connection error:", error);
+    logger.error("❌ MongoDB connection error", "DATABASE", error);
     throw error;
   }
 }
@@ -19,24 +20,24 @@ export async function connectToDatabase() {
 export async function disconnectFromDatabase() {
   try {
     await mongoose.disconnect();
-    console.log("🔌 Disconnected from MongoDB");
+    logger.info("🔌 Disconnected from MongoDB", "DATABASE");
   } catch (error) {
-    console.error("❌ MongoDB disconnection error:", error);
+    logger.error("❌ MongoDB disconnection error", "DATABASE", error);
     throw error;
   }
 }
 
 // Handle connection events
 mongoose.connection.on("connected", () => {
-  console.log("🟢 Mongoose connected to MongoDB");
+  logger.info("🟢 Mongoose connected to MongoDB", "DATABASE");
 });
 
 mongoose.connection.on("error", (err) => {
-  console.error("🔴 Mongoose connection error:", err);
+  logger.error("🔴 Mongoose connection error", "DATABASE", err);
 });
 
 mongoose.connection.on("disconnected", () => {
-  console.log("🟡 Mongoose disconnected from MongoDB");
+  logger.info("🟡 Mongoose disconnected from MongoDB", "DATABASE");
 });
 
 // Graceful shutdown
