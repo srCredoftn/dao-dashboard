@@ -455,6 +455,25 @@ export default function DaoDetail() {
   const [isEditingAuthority, setIsEditingAuthority] = useState(false);
   const [tempAuthority, setTempAuthority] = useState("");
 
+  // Debouncing pour optimiser les performances
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const debouncedSave = useCallback(async (daoToSave: Dao) => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        await apiService.updateDao(daoToSave.id, daoToSave);
+        console.log(`✅ DAO ${daoToSave.id} saved successfully`);
+      } catch (error) {
+        console.error("Error saving DAO:", error);
+        // En cas d'erreur, on pourrait montrer une notification à l'utilisateur
+      }
+    }, 500); // Délai de 500ms
+  }, []);
+
   // Load DAO from API
   useEffect(() => {
     const loadDao = async () => {
