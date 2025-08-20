@@ -1,5 +1,6 @@
 import express from "express";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { z } from "zod";
 import { UserModel } from "../models/User.js";
 import {
@@ -7,6 +8,7 @@ import {
   authenticate,
   requireAdmin,
 } from "../middleware/auth.js";
+import { emailService } from "../services/emailService.js";
 import type { LoginCredentials, AuthResponse } from "@shared/dao.js";
 
 const router = express.Router();
@@ -31,6 +33,21 @@ const passwordChangeSchema = z.object({
 const profileUpdateSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
   email: z.string().email("Invalid email format"),
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email format"),
+});
+
+const verifyResetTokenSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  token: z.string().min(6, "Token must be at least 6 characters"),
+});
+
+const resetPasswordSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  token: z.string().min(6, "Token must be at least 6 characters"),
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 // POST /api/auth/login - User login
@@ -290,6 +307,123 @@ router.put("/profile", authenticate, async (req, res) => {
 
     console.error("Update profile error:", error);
     res.status(500).json({ error: "Failed to update profile" });
+  }
+});
+
+// POST /api/auth/forgot-password - Request password reset
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const validatedData = forgotPasswordSchema.parse(req.body);
+    const email = validatedData.email.toLowerCase();
+
+    // Find user by email
+    const user = await UserModel.findOne({ email, isActive: true });
+
+    // Always return success for security (don't reveal if email exists)
+    const successMessage = "Si cet email existe, un code de réinitialisation a été envoyé.";
+
+    if (!user) {
+      return res.json({ message: successMessage });
+    }
+
+    // Generate reset token (6-digit code)
+    const resetToken = crypto.randomInt(100000, 999999).toString();
+    const resetExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Save reset token to user
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = resetExpires;
+    await user.save();
+
+    // Send email
+    const emailSent = await emailService.sendPasswordResetEmail(email, resetToken);
+
+    console.log(`🔑 Password reset requested for: ${email} (Token: ${resetToken})`);
+
+    res.json({
+      message: "Un code de réinitialisation a été envoyé à votre adresse email.",
+      // For development only - remove in production
+      ...(process.env.NODE_ENV === "development" && !emailSent && { developmentToken: resetToken }),
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        error: "Validation error",
+        details: error.errors,
+      });
+    }
+
+    console.error("Forgot password error:", error);
+    res.status(500).json({ error: "Failed to process password reset request" });
+  }
+});
+
+// POST /api/auth/verify-reset-token - Verify reset token
+router.post("/verify-reset-token", async (req, res) => {
+  try {
+    const validatedData = verifyResetTokenSchema.parse(req.body);
+    const { email, token } = validatedData;
+
+    const user = await UserModel.findOne({
+      email: email.toLowerCase(),
+      isActive: true,
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: "Code invalide ou expiré" });
+    }
+
+    res.json({ message: "Code vérifié avec succès" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        error: "Validation error",
+        details: error.errors,
+      });
+    }
+
+    console.error("Verify reset token error:", error);
+    res.status(500).json({ error: "Failed to verify token" });
+  }
+});
+
+// POST /api/auth/reset-password - Reset password with token
+router.post("/reset-password", async (req, res) => {
+  try {
+    const validatedData = resetPasswordSchema.parse(req.body);
+    const { email, token, newPassword } = validatedData;
+
+    const user = await UserModel.findOne({
+      email: email.toLowerCase(),
+      isActive: true,
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: "Code invalide ou expiré" });
+    }
+
+    // Update password
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    console.log(`🔑 Password reset successful for: ${user.email}`);
+    res.json({ message: "Mot de passe réinitialisé avec succès" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        error: "Validation error",
+        details: error.errors,
+      });
+    }
+
+    console.error("Reset password error:", error);
+    res.status(500).json({ error: "Failed to reset password" });
   }
 });
 

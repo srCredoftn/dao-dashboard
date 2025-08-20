@@ -96,19 +96,6 @@ export default function TaskMenuButton({
       />
 
       {/* Delete Confirmation */}
-      {showDeleteConfirm && (
-        <div style={{ position: "fixed", top: 0, left: 0, zIndex: 9999 }}>
-          <div
-            style={{
-              background: "rgba(255,0,0,0.1)",
-              padding: "10px",
-              color: "red",
-            }}
-          >
-            DEBUG: Dialogue de confirmation ouvert pour "{task.name}"
-          </div>
-        </div>
-      )}
       <ConfirmationDialog
         open={showDeleteConfirm}
         onOpenChange={(open) => {
