@@ -54,7 +54,7 @@ router.get("/me", authenticate, async (req, res) => {
 });
 
 // GET /api/auth/users - Get all users (admin only)
-router.get("/users", authenticate, requireAdmin, async (req, res) => {
+router.get("/users", authenticate, requireAdmin, async (_req, res) => {
   try {
     const users = await AuthService.getAllUsers();
     return res.json(users);
@@ -226,7 +226,7 @@ router.post("/forgot-password", async (req, res) => {
 
     return res.json({
       message:
-        "Un code de réinitialisation a été envoyé à votre adresse email.",
+        "Un code de réinitialisation a ét�� envoyé à votre adresse email.",
       // Remove this in production - only for development
       developmentToken: token,
     });
