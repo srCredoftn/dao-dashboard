@@ -601,18 +601,27 @@ export default function DaoDetail() {
   ) => {
     if (!dao) return;
 
-    const updatedDao = {
-      ...dao,
-      tasks: dao.tasks.map((task) =>
-        task.id === taskId ? { ...task, isApplicable: applicable } : task,
-      ),
-    };
+    // Utiliser la fonction unifiée handleTaskUpdate pour éviter les conflits
+    const updates = { isApplicable: applicable };
 
     // Mise à jour optimiste immédiate
-    setDao(updatedDao);
+    setDao((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        tasks: prev.tasks.map((task) =>
+          task.id === taskId ? { ...task, ...updates } : task,
+        ),
+      };
+    });
 
     // Sauvegarde différée pour éviter trop d'appels API
-    debouncedSave(updatedDao);
+    debouncedSave({
+      ...dao,
+      tasks: dao.tasks.map((task) =>
+        task.id === taskId ? { ...task, ...updates } : task,
+      ),
+    });
 
     console.log(`📝 Task ${taskId} applicability changed to ${applicable} (saving...)`);
   };
