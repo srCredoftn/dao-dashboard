@@ -108,7 +108,7 @@ export async function optionalAuth(
   req: Request,
   _res: Response,
   next: NextFunction,
-): Promise<void> {
+) {
   try {
     const authHeader = req.headers.authorization;
 
