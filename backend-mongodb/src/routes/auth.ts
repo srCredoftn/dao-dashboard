@@ -1,5 +1,6 @@
 import express from "express";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { z } from "zod";
 import { UserModel } from "../models/User.js";
 import {
@@ -7,6 +8,7 @@ import {
   authenticate,
   requireAdmin,
 } from "../middleware/auth.js";
+import { emailService } from "../services/emailService.js";
 import type { LoginCredentials, AuthResponse } from "@shared/dao.js";
 
 const router = express.Router();
