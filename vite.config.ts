@@ -14,7 +14,7 @@ export default defineConfig({
     port: 8080,
     proxy: {
       "/api": {
-        target: "http://localhost:5000", // MongoDB backend port
+        target: "http://localhost:3001", // Express backend port
         changeOrigin: true,
         secure: false,
       },
@@ -29,33 +29,37 @@ export default defineConfig({
       output: {
         manualChunks: {
           // Vendor chunks
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-charts': ['recharts'],
-          'vendor-utils': ['date-fns', 'clsx', 'class-variance-authority'],
+          "vendor-react": ["react", "react-dom", "react-router-dom"],
+          "vendor-ui": [
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-select",
+          ],
+          "vendor-query": ["@tanstack/react-query"],
+          "vendor-charts": ["recharts"],
+          "vendor-utils": ["date-fns", "clsx", "class-variance-authority"],
 
           // Large dependencies (loaded dynamically)
-          'vendor-export': ['jspdf'],
-          'vendor-icons': ['lucide-react'],
+          "vendor-export": ["jspdf"],
+          "vendor-icons": ["lucide-react"],
 
           // Application chunks
-          'shared': ['./shared/dao.ts', './shared/api.ts'],
-        }
-      }
+          shared: ["./shared/dao.ts", "./shared/api.ts"],
+        },
+      },
     },
     // Code splitting optimizations
-    target: 'esnext',
-    minify: 'esbuild',
+    target: "esnext",
+    minify: "esbuild",
     cssCodeSplit: true,
   },
   optimizeDeps: {
     include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      '@tanstack/react-query',
-      'lucide-react'
+      "react",
+      "react-dom",
+      "react-router-dom",
+      "@tanstack/react-query",
+      "lucide-react",
     ],
   },
 });

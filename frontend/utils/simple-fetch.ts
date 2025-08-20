@@ -16,10 +16,21 @@ export class SimpleFetch {
   }
 
   // Créer un timeout pour les requêtes
-  private createTimeoutSignal(timeoutMs: number): AbortSignal {
+  private createTimeoutSignal(timeoutMs: number): {
+    signal: AbortSignal;
+    cleanup: () => void;
+  } {
     const controller = new AbortController();
-    setTimeout(() => controller.abort(), timeoutMs);
-    return controller.signal;
+    const timeoutId = setTimeout(() => {
+      if (!controller.signal.aborted) {
+        controller.abort(new Error(`Request timeout after ${timeoutMs}ms`));
+      }
+    }, timeoutMs);
+
+    return {
+      signal: controller.signal,
+      cleanup: () => clearTimeout(timeoutId),
+    };
   }
 
   // Méthode principale de fetch
@@ -34,66 +45,86 @@ export class SimpleFetch {
       ...fetchOptions
     } = options;
 
+    let timeoutCleanup: (() => void) | null = null;
+
     // Ajouter un timeout si pas déjà spécifié
     if (!fetchOptions.signal && timeout > 0) {
-      fetchOptions.signal = this.createTimeoutSignal(timeout);
+      const timeoutData = this.createTimeoutSignal(timeout);
+      fetchOptions.signal = timeoutData.signal;
+      timeoutCleanup = timeoutData.cleanup;
     }
 
     let lastError: Error | null = null;
 
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(
-          `🌐 Simple fetch attempt ${attempt + 1}/${maxRetries + 1}: ${url}`,
-        );
+    try {
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(
+            `🌐 Simple fetch attempt ${attempt + 1}/${maxRetries + 1}: ${url}`,
+          );
 
-        // Utiliser window.fetch directement pour éviter les problèmes d'iframe
-        const response = await window.fetch(url, fetchOptions);
+          // Utiliser window.fetch directement pour éviter les problèmes d'iframe
+          const response = await window.fetch(url, fetchOptions);
 
-        console.log(`✅ Simple fetch successful: ${url} (${response.status})`);
-        return response;
-      } catch (error) {
-        lastError = error as Error;
-        const errorMessage = lastError.message;
+          console.log(
+            `✅ Simple fetch successful: ${url} (${response.status})`,
+          );
 
-        console.warn(
-          `⚠️ Simple fetch attempt ${attempt + 1} failed:`,
-          errorMessage,
-        );
+          // Nettoyer le timeout sur succès
+          if (timeoutCleanup) {
+            timeoutCleanup();
+          }
 
-        // Vérifier si c'est une erreur réseau temporaire
-        const isRetriableError =
-          errorMessage.includes("Failed to fetch") ||
-          errorMessage.includes("network") ||
-          errorMessage.includes("timeout") ||
-          errorMessage.includes("AbortError") ||
-          errorMessage.includes("TypeError");
+          return response;
+        } catch (error) {
+          lastError = error as Error;
+          const errorMessage = lastError.message;
 
-        // Ne pas retry sur la dernière tentative ou si l'erreur n'est pas retriable
-        if (attempt === maxRetries || !isRetriableError) {
-          break;
+          console.warn(
+            `⚠️ Simple fetch attempt ${attempt + 1} failed:`,
+            errorMessage,
+          );
+
+          // Vérifier si c'est une erreur réseau temporaire
+          const isRetriableError =
+            errorMessage.includes("Failed to fetch") ||
+            errorMessage.includes("network") ||
+            errorMessage.includes("timeout") ||
+            (errorMessage.includes("AbortError") &&
+              !errorMessage.includes("timeout")) ||
+            errorMessage.includes("TypeError");
+
+          // Ne pas retry sur la dernière tentative ou si l'erreur n'est pas retriable
+          if (attempt === maxRetries || !isRetriableError) {
+            break;
+          }
+
+          // Délai avant le retry
+          const delay = retryDelay * Math.pow(2, attempt);
+          console.log(`⏳ Retrying in ${delay}ms...`);
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
+      }
 
-        // Délai avant le retry
-        const delay = retryDelay * Math.pow(2, attempt);
-        console.log(`⏳ Retrying in ${delay}ms...`);
-        await new Promise((resolve) => setTimeout(resolve, delay));
+      // Si toutes les tentatives ont échoué
+      console.error(`❌ All simple fetch attempts failed for: ${url}`);
+
+      if (lastError) {
+        const enhancedError = new Error(
+          `Network request failed after ${maxRetries + 1} attempts: ${lastError.message}`,
+        );
+        enhancedError.name = "SimpleFetchError";
+        enhancedError.stack = lastError.stack;
+        throw enhancedError;
+      }
+
+      throw new Error("Network request failed: Unknown error");
+    } finally {
+      // S'assurer que le timeout est nettoyé
+      if (timeoutCleanup) {
+        timeoutCleanup();
       }
     }
-
-    // Si toutes les tentatives ont échoué
-    console.error(`❌ All simple fetch attempts failed for: ${url}`);
-
-    if (lastError) {
-      const enhancedError = new Error(
-        `Network request failed after ${maxRetries + 1} attempts: ${lastError.message}`,
-      );
-      enhancedError.name = "SimpleFetchError";
-      enhancedError.stack = lastError.stack;
-      throw enhancedError;
-    }
-
-    throw new Error("Network request failed: Unknown error");
   }
 
   // Méthodes utilitaires
