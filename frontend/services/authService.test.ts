@@ -69,7 +69,7 @@ describe("AuthService", () => {
       };
 
       await expect(authService.login(credentials)).rejects.toThrow(
-        "Invalid credentials",
+        "Identifiants incorrects, veuillez réessayer",
       );
     });
   });
