@@ -1,0 +1,111 @@
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import type { DaoTask } from "@shared/dao";
+
+interface TaskEditDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  task?: DaoTask;
+  onSave: (updates: Partial<DaoTask>) => void;
+}
+
+export default function TaskEditDialog({
+  open,
+  onOpenChange,
+  task,
+  onSave,
+}: TaskEditDialogProps) {
+  const [taskName, setTaskName] = useState("");
+  const [isApplicable, setIsApplicable] = useState(true);
+
+  // Initialize form data when task changes
+  useEffect(() => {
+    if (task) {
+      setTaskName(task.name);
+      setIsApplicable(task.isApplicable);
+    } else {
+      setTaskName("");
+      setIsApplicable(true); // Default to applicable for new tasks
+    }
+  }, [task]);
+
+  const handleSave = () => {
+    if (!taskName.trim()) {
+      return; // Don't save if name is empty
+    }
+
+    const updates: Partial<DaoTask> = {
+      name: taskName.trim(),
+      isApplicable,
+    };
+
+    onSave(updates);
+  };
+
+  const handleCancel = () => {
+    onOpenChange(false);
+  };
+
+  const isEditing = !!task;
+  const title = isEditing ? "Modifier la tâche" : "Nouvelle tâche";
+  const description = isEditing
+    ? "Modifiez les détails de cette tâche."
+    : "Ajoutez une nouvelle tâche à ce DAO.";
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          {/* Task Name */}
+          <div className="space-y-2">
+            <Label htmlFor="task-name">Nom de la tâche *</Label>
+            <Input
+              id="task-name"
+              value={taskName}
+              onChange={(e) => setTaskName(e.target.value)}
+              placeholder="Entrez le nom de la tâche"
+              className="w-full"
+            />
+          </div>
+
+          {/* Is Applicable */}
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="is-applicable"
+              checked={isApplicable}
+              onCheckedChange={setIsApplicable}
+            />
+            <Label htmlFor="is-applicable">
+              Cette tâche est applicable à ce DAO
+            </Label>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={handleCancel}>
+            Annuler
+          </Button>
+          <Button onClick={handleSave} disabled={!taskName.trim()}>
+            {isEditing ? "Enregistrer" : "Ajouter"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
