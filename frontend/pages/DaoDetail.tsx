@@ -529,7 +529,9 @@ export default function DaoDetail() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <h2 className="text-lg font-semibold text-foreground mb-2">Chargement de la page</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-2">
+            Chargement de la page
+          </h2>
           <p className="text-muted-foreground">Veuillez patienter...</p>
         </div>
       </div>
@@ -579,7 +581,9 @@ export default function DaoDetail() {
     // Sauvegarde différée pour éviter trop d'appels API
     debouncedSave(updatedDao);
 
-    console.log(`📝 Task ${taskId} progress changed to ${newProgress}% (saving...)`);
+    console.log(
+      `📝 Task ${taskId} progress changed to ${newProgress}% (saving...)`,
+    );
   };
 
   const handleTaskCommentChange = (taskId: number, newComment: string) => {
@@ -595,10 +599,7 @@ export default function DaoDetail() {
     );
   };
 
-  const handleTaskApplicableChange = (
-    taskId: number,
-    applicable: boolean,
-  ) => {
+  const handleTaskApplicableChange = (taskId: number, applicable: boolean) => {
     if (!dao) return;
 
     // Utiliser la fonction unifiée handleTaskUpdate pour éviter les conflits
@@ -623,7 +624,9 @@ export default function DaoDetail() {
       ),
     });
 
-    console.log(`📝 Task ${taskId} applicability changed to ${applicable} (saving...)`);
+    console.log(
+      `📝 Task ${taskId} applicability changed to ${applicable} (saving...)`,
+    );
   };
 
   const handleTeamUpdate = (newTeam: TeamMember[]) => {

@@ -30,7 +30,9 @@ class DaoStorage {
     });
 
     if (verbose) {
-      console.log(`📊 DAO indexes rebuilt: ${this.storage.length} DAOs indexed`);
+      console.log(
+        `📊 DAO indexes rebuilt: ${this.storage.length} DAOs indexed`,
+      );
     }
   }
 
@@ -63,7 +65,10 @@ class DaoStorage {
       this.storage[index] = dao;
 
       // Optimisation: seulement reconstruire les indexes si nécessaire
-      if (oldDao.id !== dao.id || oldDao.autoriteContractante !== dao.autoriteContractante) {
+      if (
+        oldDao.id !== dao.id ||
+        oldDao.autoriteContractante !== dao.autoriteContractante
+      ) {
         this.rebuildIndexes(true);
       } else {
         // Pas besoin de reconstruire les indexes pour les mises à jour de contenu

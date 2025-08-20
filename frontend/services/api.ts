@@ -109,7 +109,11 @@ class ApiService {
     return result;
   }
 
-  async updateDao(id: string, updates: Partial<Dao>, skipCacheInvalidation = false): Promise<Dao> {
+  async updateDao(
+    id: string,
+    updates: Partial<Dao>,
+    skipCacheInvalidation = false,
+  ): Promise<Dao> {
     const result = await this.request<Dao>(`/dao/${id}`, {
       method: "PUT",
       body: JSON.stringify(updates),

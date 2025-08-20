@@ -93,11 +93,15 @@ export default function TaskEditDialog({
               onCheckedChange={setIsApplicable}
               disabled={isEditing} // Désactivé en mode édition
             />
-            <Label htmlFor="is-applicable" className={isEditing ? "text-muted-foreground" : ""}>
+            <Label
+              htmlFor="is-applicable"
+              className={isEditing ? "text-muted-foreground" : ""}
+            >
               Cette tâche est applicable à ce DAO
               {isEditing && (
                 <span className="block text-xs text-muted-foreground">
-                  (Utilisez le switch sur la page principale pour modifier l'applicabilité)
+                  (Utilisez le switch sur la page principale pour modifier
+                  l'applicabilité)
                 </span>
               )}
             </Label>
