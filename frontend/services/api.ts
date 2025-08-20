@@ -109,15 +109,24 @@ class ApiService {
     return result;
   }
 
-  async updateDao(id: string, updates: Partial<Dao>): Promise<Dao> {
+  async updateDao(
+    id: string,
+    updates: Partial<Dao>,
+    skipCacheInvalidation = false,
+  ): Promise<Dao> {
     const result = await this.request<Dao>(`/dao/${id}`, {
       method: "PUT",
       body: JSON.stringify(updates),
     });
 
-    // Invalider le cache après mise à jour
-    cacheService.delete("all-daos");
-    cacheService.delete(`dao-${id}`);
+    // Invalider le cache après mise à jour (sauf si explicitement désactivé pour les mises à jour fréquentes)
+    if (!skipCacheInvalidation) {
+      cacheService.delete("all-daos");
+      cacheService.delete(`dao-${id}`);
+    } else {
+      // Pour les mises à jour fréquentes, on met simplement à jour le cache
+      cacheService.set(`dao-${id}`, result, 3 * 60 * 1000);
+    }
 
     return result;
   }

@@ -29,16 +29,16 @@ export default function TaskEditDialog({
   const [taskName, setTaskName] = useState("");
   const [isApplicable, setIsApplicable] = useState(true);
 
-  // Initialize form data when task changes
+  // Initialize form data when task changes or dialog opens
   useEffect(() => {
-    if (task) {
+    if (task && open) {
       setTaskName(task.name);
       setIsApplicable(task.isApplicable);
-    } else {
+    } else if (!task) {
       setTaskName("");
       setIsApplicable(true); // Default to applicable for new tasks
     }
-  }, [task]);
+  }, [task, open]);
 
   const handleSave = () => {
     if (!taskName.trim()) {
@@ -47,7 +47,8 @@ export default function TaskEditDialog({
 
     const updates: Partial<DaoTask> = {
       name: taskName.trim(),
-      isApplicable,
+      // N'inclure isApplicable que pour les nouvelles tâches
+      ...(isEditing ? {} : { isApplicable }),
     };
 
     onSave(updates);
@@ -84,15 +85,25 @@ export default function TaskEditDialog({
             />
           </div>
 
-          {/* Is Applicable */}
+          {/* Is Applicable - Désactivé pour les tâches existantes pour éviter les conflicts */}
           <div className="flex items-center space-x-2">
             <Switch
               id="is-applicable"
               checked={isApplicable}
               onCheckedChange={setIsApplicable}
+              disabled={isEditing} // Désactivé en mode édition
             />
-            <Label htmlFor="is-applicable">
+            <Label
+              htmlFor="is-applicable"
+              className={isEditing ? "text-muted-foreground" : ""}
+            >
               Cette tâche est applicable à ce DAO
+              {isEditing && (
+                <span className="block text-xs text-muted-foreground">
+                  (Utilisez le switch sur la page principale pour modifier
+                  l'applicabilité)
+                </span>
+              )}
             </Label>
           </div>
         </div>

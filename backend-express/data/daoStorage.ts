@@ -9,11 +9,11 @@ class DaoStorage {
   private autoriteIndex: Map<string, Dao[]> = new Map();
 
   constructor() {
-    this.rebuildIndexes();
+    this.rebuildIndexes(true);
   }
 
   // Rebuild all indexes
-  private rebuildIndexes(): void {
+  private rebuildIndexes(verbose = false): void {
     this.idIndex.clear();
     this.autoriteIndex.clear();
 
@@ -29,7 +29,11 @@ class DaoStorage {
       this.autoriteIndex.get(autorite)!.push(dao);
     });
 
-    console.log(`📊 DAO indexes rebuilt: ${this.storage.length} DAOs indexed`);
+    if (verbose) {
+      console.log(
+        `📊 DAO indexes rebuilt: ${this.storage.length} DAOs indexed`,
+      );
+    }
   }
 
   // Get all DAOs
@@ -51,14 +55,25 @@ class DaoStorage {
   // Add new DAO
   add(dao: Dao): void {
     this.storage.push(dao);
-    this.rebuildIndexes(); // Rebuild indexes after adding
+    this.rebuildIndexes(true); // Rebuild indexes after adding
   }
 
-  // Update DAO at index
+  // Update DAO at index (optimized)
   updateAtIndex(index: number, dao: Dao): void {
     if (index >= 0 && index < this.storage.length) {
+      const oldDao = this.storage[index];
       this.storage[index] = dao;
-      this.rebuildIndexes(); // Rebuild indexes after updating
+
+      // Optimisation: seulement reconstruire les indexes si nécessaire
+      if (
+        oldDao.id !== dao.id ||
+        oldDao.autoriteContractante !== dao.autoriteContractante
+      ) {
+        this.rebuildIndexes(true);
+      } else {
+        // Pas besoin de reconstruire les indexes pour les mises à jour de contenu
+        console.log(`📝 DAO ${dao.id} updated (indexes preserved)`);
+      }
     }
   }
 
@@ -67,7 +82,7 @@ class DaoStorage {
     const index = this.findIndexById(id);
     if (index !== -1) {
       this.storage.splice(index, 1);
-      this.rebuildIndexes(); // Rebuild indexes after deleting
+      this.rebuildIndexes(true); // Rebuild indexes after deleting
       return true;
     }
     return false;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -156,7 +156,7 @@ function TaskRow({
             <div className="flex items-center gap-2">
               {isAdmin() ? (
                 <Switch
-                  checked={false}
+                  checked={task.isApplicable}
                   onCheckedChange={(checked) =>
                     onApplicableChange(task.id, checked)
                   }
@@ -187,7 +187,7 @@ function TaskRow({
               <span className="text-xs text-muted-foreground">Applicable:</span>
               {isAdmin() ? (
                 <Switch
-                  checked={false}
+                  checked={task.isApplicable}
                   onCheckedChange={(checked) =>
                     onApplicableChange(task.id, checked)
                   }
@@ -455,6 +455,25 @@ export default function DaoDetail() {
   const [isEditingAuthority, setIsEditingAuthority] = useState(false);
   const [tempAuthority, setTempAuthority] = useState("");
 
+  // Debouncing pour optimiser les performances
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const debouncedSave = useCallback(async (daoToSave: Dao) => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        await apiService.updateDao(daoToSave.id, daoToSave, true); // Skip cache invalidation pour optimiser
+        console.log(`✅ DAO ${daoToSave.id} saved successfully`);
+      } catch (error) {
+        console.error("Error saving DAO:", error);
+        // En cas d'erreur, on pourrait montrer une notification à l'utilisateur
+      }
+    }, 300); // Réduit le délai à 300ms pour plus de réactivité
+  }, []);
+
   // Load DAO from API
   useEffect(() => {
     const loadDao = async () => {
@@ -495,18 +514,26 @@ export default function DaoDetail() {
     loadDao();
   }, [id]);
 
-  // Loading state
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Loading state - optimisé pour être plus léger
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="w-full max-w-md p-6 text-center">
-          <div className="animate-pulse">
-            <div className="h-6 bg-gray-200 rounded mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
-          </div>
-          <p className="mt-4 text-muted-foreground">Chargement du DAO...</p>
-        </Card>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <h2 className="text-lg font-semibold text-foreground mb-2">
+            Chargement de la page
+          </h2>
+          <p className="text-muted-foreground">Veuillez patienter...</p>
+        </div>
       </div>
     );
   }
@@ -535,7 +562,7 @@ export default function DaoDetail() {
   const progress = calculateDaoProgress(dao.tasks);
   const status = calculateDaoStatus(dao.dateDepot, progress);
 
-  const handleTaskProgressChange = async (
+  const handleTaskProgressChange = (
     taskId: number,
     newProgress: number | null,
   ) => {
@@ -548,16 +575,15 @@ export default function DaoDetail() {
       ),
     };
 
-    try {
-      // Optimistic update
-      setDao(updatedDao);
-      // Persist to API
-      await apiService.updateDao(dao.id, updatedDao);
-    } catch (error) {
-      console.error("Error updating task progress:", error);
-      // Revert on error
-      setDao(dao);
-    }
+    // Mise à jour optimiste immédiate
+    setDao(updatedDao);
+
+    // Sauvegarde différée pour éviter trop d'appels API
+    debouncedSave(updatedDao);
+
+    console.log(
+      `📝 Task ${taskId} progress changed to ${newProgress}% (saving...)`,
+    );
   };
 
   const handleTaskCommentChange = (taskId: number, newComment: string) => {
@@ -573,30 +599,34 @@ export default function DaoDetail() {
     );
   };
 
-  const handleTaskApplicableChange = async (
-    taskId: number,
-    applicable: boolean,
-  ) => {
+  const handleTaskApplicableChange = (taskId: number, applicable: boolean) => {
     if (!dao) return;
 
-    const updatedDao = {
+    // Utiliser la fonction unifiée handleTaskUpdate pour éviter les conflits
+    const updates = { isApplicable: applicable };
+
+    // Mise à jour optimiste immédiate
+    setDao((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        tasks: prev.tasks.map((task) =>
+          task.id === taskId ? { ...task, ...updates } : task,
+        ),
+      };
+    });
+
+    // Sauvegarde différée pour éviter trop d'appels API
+    debouncedSave({
       ...dao,
       tasks: dao.tasks.map((task) =>
-        task.id === taskId ? { ...task, isApplicable: applicable } : task,
+        task.id === taskId ? { ...task, ...updates } : task,
       ),
-    };
+    });
 
-    try {
-      // Optimistic update
-      setDao(updatedDao);
-      // Persist to API
-      await apiService.updateDao(dao.id, updatedDao);
-      console.log(`✅ Task ${taskId} applicability updated to ${applicable}`);
-    } catch (error) {
-      console.error("Error updating task applicability:", error);
-      // Revert on error
-      setDao(dao);
-    }
+    console.log(
+      `📝 Task ${taskId} applicability changed to ${applicable} (saving...)`,
+    );
   };
 
   const handleTeamUpdate = (newTeam: TeamMember[]) => {
@@ -670,8 +700,9 @@ export default function DaoDetail() {
         });
       }
 
-      // Appliquer la réponse du serveur pour s'assurer de la cohérence
-      setDao(updatedDao);
+      // Note: On évite de faire setDao ici pour ne pas conflicter avec les mises à jour optimistes debounced
+      // La cohérence sera assurée par le prochain chargement de page
+      console.log(`✅ Task ${taskId} updated successfully on server`);
     } catch (error) {
       console.error("Error updating task:", error);
       setError("Erreur lors de la mise à jour de la tâche");
@@ -800,7 +831,7 @@ export default function DaoDetail() {
       `Objet: ${dao?.objetDossier}`,
       `Référence: ${dao?.reference}`,
       `Autorité: ${dao?.autoriteContractante}`,
-      `Date de dépôt: ${dao?.dateDepot}`,
+      `Date de d��pôt: ${dao?.dateDepot}`,
       `Progression globale: ${progress}%`,
     ];
 
