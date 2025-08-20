@@ -84,7 +84,7 @@ export function createServer() {
         // Basic JSON structure validation
         if (buf && buf.length) {
           try {
-            JSON.parse(buf.toString(encoding as BufferEncoding || "utf8"));
+            JSON.parse(buf.toString((encoding as BufferEncoding) || "utf8"));
           } catch (err) {
             const error = new Error("Invalid JSON");
             (error as any).status = 400;

@@ -232,7 +232,9 @@ router.post("/forgot-password", async (req, res) => {
     });
   } catch (error) {
     console.error("Forgot password error:", error);
-    return res.status(500).json({ error: "Failed to process password reset request" });
+    return res
+      .status(500)
+      .json({ error: "Failed to process password reset request" });
   }
 });
 
