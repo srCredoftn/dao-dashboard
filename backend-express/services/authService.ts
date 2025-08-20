@@ -165,7 +165,7 @@ export class AuthService {
       console.log(`📊 Active sessions count: ${activeSessions.size}`);
 
       // Premièrement, essayons de décoder et vérifier le JWT
-      const decoded = jwt.verify(token, JWT_SECRET, {
+      const decoded = jwt.verify(token, JWT_SECRET!, {
         issuer: "dao-management",
         audience: "dao-app",
       }) as AuthUser;
@@ -278,7 +278,7 @@ export class AuthService {
     // Invalidate all sessions for this user
     for (const token of activeSessions) {
       try {
-        const decoded = jwt.verify(token, JWT_SECRET) as AuthUser;
+        const decoded = jwt.verify(token, JWT_SECRET!) as AuthUser;
         if (decoded.id === id) {
           activeSessions.delete(token);
         }
@@ -421,7 +421,7 @@ export class AuthService {
     let cleanedCount = 0;
     for (const token of activeSessions) {
       try {
-        jwt.verify(token, JWT_SECRET);
+        jwt.verify(token, JWT_SECRET!);
       } catch {
         activeSessions.delete(token);
         cleanedCount++;
