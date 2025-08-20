@@ -146,7 +146,7 @@ router.get("/next-number", authenticate, (req, res): void => {
 });
 
 // GET /api/dao/:id - Get DAO by ID (authenticated users only)
-router.get("/:id", authenticate, (req, res) => {
+router.get("/:id", authenticate, (req, res): void => {
   try {
     const { id } = req.params;
 
