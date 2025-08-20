@@ -163,7 +163,7 @@ export function createServer() {
       err: any,
       req: express.Request,
       res: express.Response,
-      next: express.NextFunction,
+      _next: express.NextFunction,
     ) => {
       logger.error(
         "Unhandled error",
