@@ -128,7 +128,7 @@ export async function optionalAuth(
     // Don't fail on optional auth, just continue without user
     console.log(
       "Optional auth failed, continuing without user:",
-      error.message,
+      (error as Error).message,
     );
     next();
   }
