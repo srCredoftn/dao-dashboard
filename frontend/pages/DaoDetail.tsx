@@ -407,7 +407,7 @@ function TaskRow({
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
               <span className="text-xs font-medium text-muted-foreground">
-                Assigné ��:
+                Assigné à:
               </span>
               <span className="text-xs font-medium">
                 {task.assignedTo
