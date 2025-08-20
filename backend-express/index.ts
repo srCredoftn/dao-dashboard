@@ -57,7 +57,7 @@ export function createServer() {
     standardHeaders: true,
     legacyHeaders: false,
     // Skip rate limiting pour certains cas en développement
-    skip: (req) => {
+    skip: (_req) => {
       if (process.env.NODE_ENV === "development") {
         // Plus de flexibilité en dev, mais garde une protection minimale
         return false;
@@ -80,11 +80,11 @@ export function createServer() {
   app.use(
     express.json({
       limit: "10mb",
-      verify: (req, res, buf, encoding) => {
+      verify: (_req, _res, buf, encoding) => {
         // Basic JSON structure validation
         if (buf && buf.length) {
           try {
-            JSON.parse(buf.toString(encoding || "utf8"));
+            JSON.parse(buf.toString(encoding as BufferEncoding || "utf8"));
           } catch (err) {
             const error = new Error("Invalid JSON");
             (error as any).status = 400;
