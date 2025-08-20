@@ -11,13 +11,13 @@ export const serverMockDaos = [
       {
         id: "1",
         name: "Marie Dubois",
-        role: "chef_equipe",
+        role: "chef_equipe" as const,
         email: "marie.dubois@2snd.fr",
       },
       {
         id: "2",
         name: "Pierre Martin",
-        role: "membre_equipe",
+        role: "membre_equipe" as const,
         email: "pierre.martin@2snd.fr",
       },
     ],
@@ -127,13 +127,13 @@ export const serverMockDaos = [
       {
         id: "4",
         name: "Jean Moreau",
-        role: "chef_equipe",
+        role: "chef_equipe" as const,
         email: "jean.moreau@2snd.fr",
       },
       {
         id: "3",
         name: "Sophie Laurent",
-        role: "membre_equipe",
+        role: "membre_equipe" as const,
         email: "sophie.laurent@2snd.fr",
       },
     ],
@@ -239,13 +239,13 @@ export const serverMockDaos = [
       {
         id: "1",
         name: "Marie Dubois",
-        role: "chef_equipe",
+        role: "chef_equipe" as const,
         email: "marie.dubois@2snd.fr",
       },
       {
         id: "3",
         name: "Sophie Laurent",
-        role: "membre_equipe",
+        role: "membre_equipe" as const,
         email: "sophie.laurent@2snd.fr",
       },
     ],
@@ -356,7 +356,7 @@ export const serverMockDaos = [
       {
         id: "2",
         name: "Pierre Martin",
-        role: "chef_equipe",
+        role: "chef_equipe" as const,
         email: "pierre.martin@2snd.fr",
       },
     ],
