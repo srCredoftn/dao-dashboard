@@ -263,7 +263,7 @@ export class AuthService {
     }
 
     user.role = role;
-    console.log(`🔄 User role updated: ${user.email} → ${role}`);
+    devLog.info(`🔄 User role updated: ${user.email} → ${role}`);
     return user;
   }
 
@@ -305,7 +305,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     userPasswords[user.email] = hashedPassword;
 
-    console.log(`�� Password changed for: ${user.email}`);
+    console.log(`🔑 Password changed for: ${user.email}`);
     return true;
   }
 
@@ -408,7 +408,7 @@ export class AuthService {
     // Remove used token
     delete resetTokens[token];
 
-    console.log(`��� Password reset successful for: ${user.email}`);
+    console.log(`🔑 Password reset successful for: ${user.email}`);
     return true;
   }
 
