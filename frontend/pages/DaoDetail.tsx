@@ -592,7 +592,7 @@ export default function DaoDetail() {
     );
   };
 
-  const handleTaskApplicableChange = async (
+  const handleTaskApplicableChange = (
     taskId: number,
     applicable: boolean,
   ) => {
@@ -605,17 +605,13 @@ export default function DaoDetail() {
       ),
     };
 
-    try {
-      // Optimistic update
-      setDao(updatedDao);
-      // Persist to API
-      await apiService.updateDao(dao.id, updatedDao);
-      console.log(`✅ Task ${taskId} applicability updated to ${applicable}`);
-    } catch (error) {
-      console.error("Error updating task applicability:", error);
-      // Revert on error
-      setDao(dao);
-    }
+    // Mise à jour optimiste immédiate
+    setDao(updatedDao);
+
+    // Sauvegarde différée pour éviter trop d'appels API
+    debouncedSave(updatedDao);
+
+    console.log(`📝 Task ${taskId} applicability changed to ${applicable} (saving...)`);
   };
 
   const handleTeamUpdate = (newTeam: TeamMember[]) => {
