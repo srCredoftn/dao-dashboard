@@ -563,7 +563,7 @@ export default function DaoDetail() {
   const progress = calculateDaoProgress(dao.tasks);
   const status = calculateDaoStatus(dao.dateDepot, progress);
 
-  const handleTaskProgressChange = async (
+  const handleTaskProgressChange = (
     taskId: number,
     newProgress: number | null,
   ) => {
@@ -576,16 +576,13 @@ export default function DaoDetail() {
       ),
     };
 
-    try {
-      // Optimistic update
-      setDao(updatedDao);
-      // Persist to API
-      await apiService.updateDao(dao.id, updatedDao);
-    } catch (error) {
-      console.error("Error updating task progress:", error);
-      // Revert on error
-      setDao(dao);
-    }
+    // Mise à jour optimiste immédiate
+    setDao(updatedDao);
+
+    // Sauvegarde différée pour éviter trop d'appels API
+    debouncedSave(updatedDao);
+
+    console.log(`📝 Task ${taskId} progress changed to ${newProgress}% (saving...)`);
   };
 
   const handleTaskCommentChange = (taskId: number, newComment: string) => {
