@@ -16,7 +16,7 @@ export async function authenticate(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
+): Promise<void> {
   try {
     const authHeader = req.headers.authorization;
 
@@ -67,7 +67,7 @@ export async function authenticate(
 
 // Authorization middleware factory
 export function authorize(roles: UserRole[]) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
       console.log(
         `🚫 No user context for ${req.method} ${req.originalUrl} from ${req.ip}`,
@@ -106,9 +106,9 @@ export const requireAuth = authenticate;
 // Optional authentication middleware (doesn't fail if no token)
 export async function optionalAuth(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction,
-) {
+): Promise<void> {
   try {
     const authHeader = req.headers.authorization;
 
