@@ -1153,29 +1153,33 @@ export default function DaoDetail() {
             </div>
 
             <div className="flex items-center gap-3">
-              <ExportFilterDialog
-                tasks={dao.tasks}
-                onExport={handleExportWithOptions}
-              >
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporter ce DAO
-                </Button>
-              </ExportFilterDialog>
-              <ConfirmationDialog
-                trigger={
-                  <Button variant="destructive" size="sm" disabled={isDeleting}>
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    {isDeleting ? "Suppression..." : "Supprimer"}
-                  </Button>
-                }
-                title="Supprimer le DAO"
-                description={`Êtes-vous sûr de vouloir supprimer le DAO ${dao?.numeroListe} ? Cette action est irréversible.`}
-                confirmText="Supprimer"
-                onConfirm={handleDelete}
-                disabled={isDeleting}
-                icon="trash"
-              />
+              {isAdmin && (
+                <>
+                  <ExportFilterDialog
+                    tasks={dao.tasks}
+                    onExport={handleExportWithOptions}
+                  >
+                    <Button variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Exporter ce DAO
+                    </Button>
+                  </ExportFilterDialog>
+                  <ConfirmationDialog
+                    trigger={
+                      <Button variant="destructive" size="sm" disabled={isDeleting}>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        {isDeleting ? "Suppression..." : "Supprimer"}
+                      </Button>
+                    }
+                    title="Supprimer le DAO"
+                    description={`Êtes-vous sûr de vouloir supprimer le DAO ${dao?.numeroListe} ? Cette action est irréversible.`}
+                    confirmText="Supprimer"
+                    onConfirm={handleDelete}
+                    disabled={isDeleting}
+                    icon="trash"
+                  />
+                </>
+              )}
               <Badge variant="secondary" className="text-sm font-bold">
                 {progress}% terminé
               </Badge>
