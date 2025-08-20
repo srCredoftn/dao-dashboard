@@ -90,7 +90,7 @@ router.get("/", authenticate, auditLog("VIEW_ALL_DAOS"), (req, res) => {
 });
 
 // GET /api/dao/next-number - Get next DAO number (authenticated users only)
-router.get("/next-number", authenticate, (req, res) => {
+router.get("/next-number", authenticate, (req, res): void => {
   try {
     const year = new Date().getFullYear();
 
