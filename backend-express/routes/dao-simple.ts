@@ -105,7 +105,7 @@ router.get("/next-number", authenticate, (req, res) => {
     // Filter DAOs for current year with safer regex
     const currentYearDaos = daoStorage.filter((dao) => {
       const match = dao.numeroListe.match(/^DAO-(\d{4})-(\d{3})$/);
-      return match && parseInt(match[1], 10) === year;
+      return Boolean(match && parseInt(match[1], 10) === year);
     });
 
     if (currentYearDaos.length === 0) {
