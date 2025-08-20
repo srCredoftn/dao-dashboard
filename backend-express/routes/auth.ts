@@ -224,7 +224,7 @@ router.post("/forgot-password", async (req, res) => {
     // For development, we'll return the token in the response
     console.log(`📧 Password reset code for ${email}: ${token}`);
 
-    res.json({
+    return res.json({
       message:
         "Un code de réinitialisation a été envoyé à votre adresse email.",
       // Remove this in production - only for development
@@ -232,7 +232,7 @@ router.post("/forgot-password", async (req, res) => {
     });
   } catch (error) {
     console.error("Forgot password error:", error);
-    res.status(500).json({ error: "Failed to process password reset request" });
+    return res.status(500).json({ error: "Failed to process password reset request" });
   }
 });
 
@@ -251,10 +251,10 @@ router.post("/verify-reset-token", async (req, res) => {
       return res.status(400).json({ error: "Code invalide ou expiré" });
     }
 
-    res.json({ message: "Code vérifié avec succès" });
+    return res.json({ message: "Code vérifié avec succès" });
   } catch (error) {
     console.error("Verify reset token error:", error);
-    res.status(500).json({ error: "Failed to verify reset token" });
+    return res.status(500).json({ error: "Failed to verify reset token" });
   }
 });
 
