@@ -514,6 +514,15 @@ export default function DaoDetail() {
     loadDao();
   }, [id]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Loading state
   if (loading) {
     return (
