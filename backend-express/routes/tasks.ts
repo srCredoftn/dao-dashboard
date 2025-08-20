@@ -30,7 +30,7 @@ router.post(
   authenticate,
   requireAdmin,
   auditLog("ADD_TASK"),
-  (req, res) => {
+  (req, res): void => {
     try {
       const { daoId } = req.params;
 
