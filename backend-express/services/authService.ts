@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { devLog, authLog } from "../utils/devLog";
 import type {
   User,
   AuthUser,
@@ -80,10 +81,10 @@ async function initializeUsers() {
     userPasswords[userData.email] = hashedPassword;
   }
 
-  console.log("🔐 AuthService initialized with secure password hashing");
-  console.log("👤 Users available:");
+  devLog.info("🔐 AuthService initialized with secure password hashing");
+  devLog.info("👤 Users available:");
   users.forEach((user) => {
-    console.log(`  - ${user.email} (${user.role})`);
+    devLog.info(`  - ${user.email} (${user.role})`);
   });
 }
 
@@ -98,7 +99,7 @@ export class AuthService {
     credentials: LoginCredentials,
   ): Promise<AuthResponse | null> {
     try {
-      console.log(`🔐 Login attempt for: ${credentials.email}`);
+      devLog.info(`🔐 Login attempt for: ${credentials.email}`);
 
       const user = users.find(
         (u) =>
@@ -107,13 +108,13 @@ export class AuthService {
       );
 
       if (!user) {
-        console.log(`❌ User not found: ${credentials.email}`);
+        authLog.login(credentials.email, false);
         return null;
       }
 
       const hashedPassword = userPasswords[user.email];
       if (!hashedPassword) {
-        console.log(`❌ No password hash found for: ${credentials.email}`);
+        authLog.login(credentials.email, false);
         return null;
       }
 
@@ -122,7 +123,7 @@ export class AuthService {
         hashedPassword,
       );
       if (!isValidPassword) {
-        console.log(`❌ Invalid password for: ${credentials.email}`);
+        authLog.login(credentials.email, false);
         return null;
       }
 
@@ -146,7 +147,7 @@ export class AuthService {
       // Update last login
       user.lastLogin = new Date().toISOString();
 
-      console.log(`✅ User logged in: ${user.email} Role: ${user.role}`);
+      authLog.login(user.email, true);
 
       return {
         user: authUser,
