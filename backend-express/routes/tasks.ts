@@ -190,7 +190,7 @@ router.delete(
   authenticate,
   requireAdmin,
   auditLog("DELETE_TASK"),
-  (req, res) => {
+  (req, res): void => {
     try {
       const { daoId, taskId } = req.params;
 
