@@ -67,7 +67,7 @@ export async function authenticate(
 
 // Authorization middleware factory
 export function authorize(roles: UserRole[]) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       console.log(
         `🚫 No user context for ${req.method} ${req.originalUrl} from ${req.ip}`,
