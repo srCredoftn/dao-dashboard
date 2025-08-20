@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { devLog, authLog } from "../utils/devLog";
 import type {
   User,
   AuthUser,
@@ -80,10 +81,10 @@ async function initializeUsers() {
     userPasswords[userData.email] = hashedPassword;
   }
 
-  console.log("🔐 AuthService initialized with secure password hashing");
-  console.log("👤 Users available:");
+  devLog.info("🔐 AuthService initialized with secure password hashing");
+  devLog.info("👤 Users available:");
   users.forEach((user) => {
-    console.log(`  - ${user.email} (${user.role})`);
+    devLog.info(`  - ${user.email} (${user.role})`);
   });
 }
 
@@ -98,7 +99,7 @@ export class AuthService {
     credentials: LoginCredentials,
   ): Promise<AuthResponse | null> {
     try {
-      console.log(`🔐 Login attempt for: ${credentials.email}`);
+      devLog.info(`🔐 Login attempt for: ${credentials.email}`);
 
       const user = users.find(
         (u) =>
@@ -107,13 +108,13 @@ export class AuthService {
       );
 
       if (!user) {
-        console.log(`❌ User not found: ${credentials.email}`);
+        authLog.login(credentials.email, false);
         return null;
       }
 
       const hashedPassword = userPasswords[user.email];
       if (!hashedPassword) {
-        console.log(`❌ No password hash found for: ${credentials.email}`);
+        authLog.login(credentials.email, false);
         return null;
       }
 
@@ -122,7 +123,7 @@ export class AuthService {
         hashedPassword,
       );
       if (!isValidPassword) {
-        console.log(`❌ Invalid password for: ${credentials.email}`);
+        authLog.login(credentials.email, false);
         return null;
       }
 
@@ -146,7 +147,7 @@ export class AuthService {
       // Update last login
       user.lastLogin = new Date().toISOString();
 
-      console.log(`✅ User logged in: ${user.email} Role: ${user.role}`);
+      authLog.login(user.email, true);
 
       return {
         user: authUser,
@@ -161,8 +162,8 @@ export class AuthService {
   // Verify JWT token
   static async verifyToken(token: string): Promise<AuthUser | null> {
     try {
-      console.log(`🔍 Verifying token: ${token.substring(0, 20)}...`);
-      console.log(`📊 Active sessions count: ${activeSessions.size}`);
+      devLog.debug(`🔍 Verifying token: ${token.substring(0, 20)}...`);
+      devLog.debug(`📊 Active sessions count: ${activeSessions.size}`);
 
       // Premièrement, essayons de décoder et vérifier le JWT
       const decoded = jwt.verify(token, JWT_SECRET as string, {
@@ -170,12 +171,12 @@ export class AuthService {
         audience: "dao-app",
       }) as AuthUser;
 
-      console.log(`✅ Token decoded successfully for user: ${decoded.email}`);
+      devLog.debug(`✅ Token decoded successfully for user: ${decoded.email}`);
 
       // Verify user still exists and is active
       const user = users.find((u) => u.id === decoded.id && u.isActive);
       if (!user) {
-        console.log(`❌ User not found or inactive: ${decoded.id}`);
+        devLog.warn(`❌ User not found or inactive: ${decoded.id}`);
         activeSessions.delete(token);
         return null;
       }
@@ -183,19 +184,19 @@ export class AuthService {
       // Si le token est valide mais pas dans les sessions actives (ex: après redémarrage),
       // on l'ajoute automatiquement aux sessions actives
       if (!activeSessions.has(token)) {
-        console.log(
+        devLog.debug(
           `🔄 Token valid but not in sessions, adding to active sessions`,
         );
         activeSessions.add(token);
       }
 
-      console.log(`✅ Token verification successful for: ${user.email}`);
+      authLog.tokenVerification(user.email, true);
       return decoded;
     } catch (error) {
       if (error instanceof jwt.JsonWebTokenError) {
-        console.log(`❌ JWT Error: ${error.message}`);
+        devLog.warn(`❌ JWT Error: ${error.message}`);
       } else {
-        console.log(`❌ Token verification error:`, error);
+        devLog.warn(`❌ Token verification error:`, error);
       }
       activeSessions.delete(token);
       return null;
@@ -337,7 +338,7 @@ export class AuthService {
     user.name = updates.name;
     user.email = updates.email.toLowerCase();
 
-    console.log(`📝 Profile updated for: ${user.email}`);
+    devLog.info(`📝 Profile updated for: ${user.email}`);
     return user;
   }
 
