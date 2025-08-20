@@ -84,7 +84,7 @@ router.get("/", authenticate, auditLog("VIEW_ALL_DAOS"), (req, res) => {
     );
     res.json(filteredDaos);
   } catch (error) {
-    console.error("Error in GET /api/dao:", error);
+    devLog.error("Error in GET /api/dao:", error);
     res.status(500).json({
       error: "Failed to fetch DAOs",
       code: "FETCH_ERROR",
