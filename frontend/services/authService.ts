@@ -52,8 +52,8 @@ class AuthApiService {
       const response = await simpleFetch.fetch(url, {
         ...options,
         headers,
-        timeout: 10000, // 10 secondes timeout
-        maxRetries: 2,
+        timeout: 20000, // 20 secondes timeout pour auth
+        maxRetries: 1, // Moins de retry pour éviter les conflits
       });
 
       if (!response.ok) {
