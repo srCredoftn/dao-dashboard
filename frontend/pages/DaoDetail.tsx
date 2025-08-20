@@ -523,18 +523,15 @@ export default function DaoDetail() {
     };
   }, []);
 
-  // Loading state
+  // Loading state - optimisé pour être plus léger
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="w-full max-w-md p-6 text-center">
-          <div className="animate-pulse">
-            <div className="h-6 bg-gray-200 rounded mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
-          </div>
-          <p className="mt-4 text-muted-foreground">Chargement du DAO...</p>
-        </Card>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <h2 className="text-lg font-semibold text-foreground mb-2">Chargement de la page</h2>
+          <p className="text-muted-foreground">Veuillez patienter...</p>
+        </div>
       </div>
     );
   }
@@ -821,7 +818,7 @@ export default function DaoDetail() {
       `Objet: ${dao?.objetDossier}`,
       `Référence: ${dao?.reference}`,
       `Autorité: ${dao?.autoriteContractante}`,
-      `Date de dépôt: ${dao?.dateDepot}`,
+      `Date de d��pôt: ${dao?.dateDepot}`,
       `Progression globale: ${progress}%`,
     ];
 
