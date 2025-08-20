@@ -19,10 +19,10 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Identifiants incorrects" });
     }
 
-    res.json(authResponse);
+    return res.json(authResponse);
   } catch (error) {
     console.error("Login error:", error);
-    res.status(401).json({ error: "Identifiants incorrects" });
+    return res.status(401).json({ error: "Identifiants incorrects" });
   }
 });
 
@@ -36,20 +36,20 @@ router.post("/logout", authenticate, async (req, res) => {
       await AuthService.logout(token);
     }
 
-    res.json({ message: "Logged out successfully" });
+    return res.json({ message: "Logged out successfully" });
   } catch (error) {
     console.error("Logout error:", error);
-    res.status(500).json({ error: "Logout failed" });
+    return res.status(500).json({ error: "Logout failed" });
   }
 });
 
 // GET /api/auth/me - Get current user info
 router.get("/me", authenticate, async (req, res) => {
   try {
-    res.json({ user: req.user });
+    return res.json({ user: req.user });
   } catch (error) {
     console.error("Get user info error:", error);
-    res.status(500).json({ error: "Failed to get user info" });
+    return res.status(500).json({ error: "Failed to get user info" });
   }
 });
 
@@ -57,10 +57,10 @@ router.get("/me", authenticate, async (req, res) => {
 router.get("/users", authenticate, requireAdmin, async (req, res) => {
   try {
     const users = await AuthService.getAllUsers();
-    res.json(users);
+    return res.json(users);
   } catch (error) {
     console.error("Get users error:", error);
-    res.status(500).json({ error: "Failed to get users" });
+    return res.status(500).json({ error: "Failed to get users" });
   }
 });
 
