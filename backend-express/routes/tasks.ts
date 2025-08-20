@@ -109,7 +109,7 @@ router.put(
   authenticate,
   requireAdmin,
   auditLog("UPDATE_TASK_NAME"),
-  (req, res) => {
+  (req, res): void => {
     try {
       const { daoId, taskId } = req.params;
 
