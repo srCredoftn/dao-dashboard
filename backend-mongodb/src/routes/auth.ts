@@ -35,6 +35,21 @@ const profileUpdateSchema = z.object({
   email: z.string().email("Invalid email format"),
 });
 
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email format"),
+});
+
+const verifyResetTokenSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  token: z.string().min(6, "Token must be at least 6 characters"),
+});
+
+const resetPasswordSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  token: z.string().min(6, "Token must be at least 6 characters"),
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
+});
+
 // POST /api/auth/login - User login
 router.post("/login", async (req, res) => {
   try {
