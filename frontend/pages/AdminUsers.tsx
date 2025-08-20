@@ -56,6 +56,8 @@ export default function AdminUsers() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
 
   // Form states
   const [newUser, setNewUser] = useState({
@@ -127,19 +129,20 @@ export default function AdminUsers() {
   };
 
   const handleDeactivateUser = async (userId: string) => {
-    if (
-      !window.confirm("Êtes-vous sûr de vouloir désactiver cet utilisateur ?")
-    ) {
-      return;
-    }
-
     try {
       await authService.deactivateUser(userId);
       await loadUsers();
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
     } catch (error) {
       console.error("Error deactivating user:", error);
       alert("Erreur lors de la désactivation de l'utilisateur");
     }
+  };
+
+  const openDeleteConfirmation = (userItem: UserType) => {
+    setUserToDelete(userItem);
+    setIsDeleteDialogOpen(true);
   };
 
   const openEditDialog = (userToEdit: UserType) => {
@@ -609,7 +612,7 @@ export default function AdminUsers() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleDeactivateUser(userItem.id)}
+                            onClick={() => openDeleteConfirmation(userItem)}
                             disabled={
                               userItem.id === user.id || !userItem.isActive
                             }
@@ -631,7 +634,7 @@ export default function AdminUsers() {
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Modifier l'utilisateur</DialogTitle>
+              <DialogTitle>Modifier le rôle</DialogTitle>
               <DialogDescription>
                 Modifier le rôle de {selectedUser?.name}
               </DialogDescription>
@@ -676,6 +679,64 @@ export default function AdminUsers() {
                 Annuler
               </Button>
               <Button onClick={handleUpdateUserRole}>Mettre à jour</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmer la suppression du rôle</DialogTitle>
+              <DialogDescription>
+                Êtes-vous sûr de vouloir supprimer définitivement ce rôle ?
+              </DialogDescription>
+            </DialogHeader>
+
+            {userToDelete && (
+              <div className="space-y-4">
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                        <User className="h-4 w-4 text-red-600" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-medium text-red-900">
+                        {userToDelete.name}
+                      </h4>
+                      <p className="text-sm text-red-700">
+                        {userToDelete.email}
+                      </p>
+                      <p className="text-xs text-red-600 mt-1">
+                        Rôle: {getRoleLabel(userToDelete.role)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Cette action supprimera définitivement le rôle et désactivera le compte utilisateur. L'utilisateur ne pourra plus se connecter à l'application.
+                </p>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsDeleteDialogOpen(false);
+                  setUserToDelete(null);
+                }}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => userToDelete && handleDeactivateUser(userToDelete.id)}
+              >
+                Supprimer définitivement
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
