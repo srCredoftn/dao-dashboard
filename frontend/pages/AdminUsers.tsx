@@ -245,10 +245,10 @@ export default function AdminUsers() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <h1 className="text-base font-bold truncate">
-                    Gestion des utilisateurs
+                    Gestion des rôles
                   </h1>
                   <p className="text-xs text-muted-foreground truncate">
-                    Gérez les comptes utilisateurs de l'application
+                    Gérez les rôles
                   </p>
                 </div>
               </div>
@@ -266,7 +266,7 @@ export default function AdminUsers() {
                     size="default"
                   >
                     <Plus className="h-5 w-5 mr-2" />
-                    Nouvel utilisateur
+                    Nouvel rôle
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
@@ -362,10 +362,10 @@ export default function AdminUsers() {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold">
-                    Gestion des utilisateurs
+                    Gestion des rôles
                   </h1>
                   <p className="text-sm text-muted-foreground">
-                    Gérez les comptes utilisateurs de l'application
+                    Gérez les rôles
                   </p>
                 </div>
               </div>
@@ -378,7 +378,7 @@ export default function AdminUsers() {
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Nouvel utilisateur
+                  Nouvel rôle
                 </Button>
               </DialogTrigger>
               <DialogContent>
