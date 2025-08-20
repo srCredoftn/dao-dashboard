@@ -29,16 +29,16 @@ export default function TaskEditDialog({
   const [taskName, setTaskName] = useState("");
   const [isApplicable, setIsApplicable] = useState(true);
 
-  // Initialize form data when task changes
+  // Initialize form data when task changes or dialog opens
   useEffect(() => {
-    if (task) {
+    if (task && open) {
       setTaskName(task.name);
       setIsApplicable(task.isApplicable);
-    } else {
+    } else if (!task) {
       setTaskName("");
       setIsApplicable(true); // Default to applicable for new tasks
     }
-  }, [task]);
+  }, [task, open]);
 
   const handleSave = () => {
     if (!taskName.trim()) {
