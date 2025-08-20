@@ -22,6 +22,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDaoStats } from "@/hooks/use-dao-stats";
 import { useDaoFilters } from "@/hooks/use-dao-filters";
+import { devLog } from "@/utils/devLogger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
