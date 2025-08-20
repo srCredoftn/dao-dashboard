@@ -134,7 +134,7 @@ export class AuthService {
         role: user.role,
       };
 
-      const token = jwt.sign(authUser, JWT_SECRET!, {
+      const token = jwt.sign(authUser, JWT_SECRET as string, {
         expiresIn: JWT_EXPIRES_IN,
         issuer: "dao-management",
         audience: "dao-app",
