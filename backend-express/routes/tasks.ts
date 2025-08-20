@@ -30,7 +30,7 @@ router.post(
   authenticate,
   requireAdmin,
   auditLog("ADD_TASK"),
-  (req, res): void => {
+  (req, res) => {
     try {
       const { daoId } = req.params;
 
@@ -109,7 +109,7 @@ router.put(
   authenticate,
   requireAdmin,
   auditLog("UPDATE_TASK_NAME"),
-  (req, res): void => {
+  (req, res) => {
     try {
       const { daoId, taskId } = req.params;
 
@@ -190,7 +190,7 @@ router.delete(
   authenticate,
   requireAdmin,
   auditLog("DELETE_TASK"),
-  (req, res): void => {
+  (req, res) => {
     try {
       const { daoId, taskId } = req.params;
 
