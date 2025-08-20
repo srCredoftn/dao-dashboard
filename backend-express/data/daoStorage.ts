@@ -77,7 +77,7 @@ class DaoStorage {
     const index = this.findIndexById(id);
     if (index !== -1) {
       this.storage.splice(index, 1);
-      this.rebuildIndexes(); // Rebuild indexes after deleting
+      this.rebuildIndexes(true); // Rebuild indexes after deleting
       return true;
     }
     return false;
