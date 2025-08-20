@@ -380,7 +380,7 @@ router.delete(
   requireAdmin,
   auditLog("DELETE_DAO"),
   sensitiveOperationLimit(),
-  (req, res) => {
+  (req, res): void => {
     try {
       const { id } = req.params;
 
