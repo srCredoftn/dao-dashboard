@@ -399,6 +399,74 @@ export default function DaoDetail() {
     }
   };
 
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, taskId: number) => {
+    setDraggedTaskId(taskId);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", taskId.toString());
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    setDraggedTaskId(null);
+    setDragOverTaskId(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    setDragOverTaskId(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetTaskId: number) => {
+    e.preventDefault();
+
+    if (!dao || !draggedTaskId || draggedTaskId === targetTaskId) {
+      return;
+    }
+
+    try {
+      // Find current positions
+      const draggedIndex = dao.tasks.findIndex(t => t.id === draggedTaskId);
+      const targetIndex = dao.tasks.findIndex(t => t.id === targetTaskId);
+
+      if (draggedIndex === -1 || targetIndex === -1) {
+        return;
+      }
+
+      // Create new task order
+      const newTasks = [...dao.tasks];
+      const [movedTask] = newTasks.splice(draggedIndex, 1);
+      newTasks.splice(targetIndex, 0, movedTask);
+
+      // Update local state immediately for better UX
+      setDao(prev => prev ? { ...prev, tasks: newTasks } : prev);
+
+      // Send reorder request to backend
+      const taskIds = newTasks.map(task => task.id);
+      const updatedDao = await taskService.reorderTasks(dao.id, taskIds);
+      setDao(updatedDao);
+
+      devLog.log(`✅ Tasks reordered successfully`);
+    } catch (error) {
+      devLog.error("Error reordering tasks:", error);
+      setError("Failed to reorder tasks");
+
+      // Reload to revert optimistic update
+      try {
+        const freshDao = await apiService.getDaoById(dao.id);
+        setDao(freshDao);
+      } catch (reloadError) {
+        devLog.error("Error reloading DAO after failed reorder:", reloadError);
+      }
+    }
+
+    setDraggedTaskId(null);
+    setDragOverTaskId(null);
+  };
+
   const handleExportWithOptions = (options: ExportOptions) => {
     if (!dao) return;
 
