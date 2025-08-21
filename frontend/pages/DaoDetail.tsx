@@ -1073,6 +1073,16 @@ export default function DaoDetail() {
                     availableMembers={dao.equipe}
                     daysDiff={dateInfo.daysDiff}
                     taskIndex={displayIndex}
+                    isDragging={draggedTaskId === task.id}
+                    isDragOver={dragOverTaskId === task.id}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => {
+                      handleDragOver(e);
+                      setDragOverTaskId(task.id);
+                    }}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
                   />
                 );
               })}
