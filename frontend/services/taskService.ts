@@ -135,6 +135,17 @@ class TaskService {
       body: JSON.stringify(updates),
     });
   }
+
+  // Reorder tasks
+  async reorderTasks(
+    daoId: string,
+    taskIds: number[],
+  ): Promise<Dao> {
+    return this.request<Dao>(`/${daoId}/tasks/reorder`, {
+      method: "PUT",
+      body: JSON.stringify({ taskIds }),
+    });
+  }
 }
 
 export const taskService = new TaskService();
