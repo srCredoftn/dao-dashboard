@@ -80,6 +80,10 @@ export default function DaoDetail() {
   const [isEditingAuthority, setIsEditingAuthority] = useState(false);
   const [tempAuthority, setTempAuthority] = useState("");
 
+  // Drag and drop states
+  const [draggedTaskId, setDraggedTaskId] = useState<number | null>(null);
+  const [dragOverTaskId, setDragOverTaskId] = useState<number | null>(null);
+
   // Debouncing pour optimiser les performances
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
