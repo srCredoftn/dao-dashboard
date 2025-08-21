@@ -50,6 +50,7 @@ import TaskAssignmentDialog from "@/components/TaskAssignmentDialog";
 import TaskComments from "@/components/TaskComments";
 import TaskMenuButton from "@/components/TaskMenuButton";
 import AddTaskButton from "@/components/AddTaskButton";
+import { TaskRow } from "@/components/TaskRow";
 import ExportFilterDialog, {
   type ExportOptions,
 } from "@/components/ExportFilterDialog";
