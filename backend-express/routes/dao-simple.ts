@@ -77,10 +77,8 @@ router.get("/", authenticate, auditLog("VIEW_ALL_DAOS"), (req, res) => {
       filteredDaos = daoStorage.getAll(); // For now, all users see all DAOs
     }
 
-    apiLog.response(
-      `Serving ${filteredDaos.length} DAOs to ${req.user?.email} (${req.user?.role})`,
-      "GET",
-      "/api/dao",
+    devLog.info(
+      `Serving ${filteredDaos.length} DAOs to ${req.user?.email} (${req.user?.role})`
     );
     res.json(filteredDaos);
   } catch (error) {
