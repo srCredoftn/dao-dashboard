@@ -391,9 +391,10 @@ export function TaskRow({
           {/* Edit Button and Assignment (Mobile) */}
           <div className="flex items-center justify-between pt-2 border-t border-gray-100 sm:hidden">
             <TaskAssignmentDialog
-              task={task}
+              currentAssignedTo={task.assignedTo}
               availableMembers={availableMembers}
-              onAssignmentChange={onAssignmentChange}
+              onAssignmentChange={(memberId) => onAssignmentChange(task.id, memberId)}
+              taskName={task.name}
             />
             <Button
               size="sm"
