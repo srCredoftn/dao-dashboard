@@ -1,5 +1,4 @@
-import { Suspense, ComponentType, ReactNode } from "react";
-import { Suspense, lazy, ReactNode } from "react";
+import { Suspense, ComponentType, ReactNode, lazy } from "react";
 import { Loader2 } from "lucide-react";
 
 interface LazyLoaderProps {
