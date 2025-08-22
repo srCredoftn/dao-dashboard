@@ -145,7 +145,7 @@ export function TaskRow({
           "bg-white rounded-lg border p-3 sm:p-4 transition-all duration-200",
           isAdmin() && "hover:cursor-move",
           isDragging && "opacity-50 transform rotate-1",
-          isDragOver && "border-blue-500 bg-blue-50"
+          isDragOver && "border-blue-500 bg-blue-50",
         )}
       >
         {/* Mobile: Vertical layout */}
@@ -229,7 +229,7 @@ export function TaskRow({
         "bg-white rounded-lg border p-3 sm:p-4 transition-all duration-200",
         isAdmin() && "hover:cursor-move",
         isDragging && "opacity-50 transform rotate-1 shadow-lg",
-        isDragOver && "border-blue-500 bg-blue-50"
+        isDragOver && "border-blue-500 bg-blue-50",
       )}
     >
       {/* Mobile: Vertical layout */}
@@ -310,9 +310,11 @@ export function TaskRow({
                 max={100}
                 step={5}
                 className="w-full"
-                style={{
-                  "--slider-color": getSliderColor(tempProgress),
-                } as React.CSSProperties}
+                style={
+                  {
+                    "--slider-color": getSliderColor(tempProgress),
+                  } as React.CSSProperties
+                }
               />
             </div>
             <div className="flex justify-between text-xs text-muted-foreground">
@@ -360,7 +362,9 @@ export function TaskRow({
             <TaskAssignmentDialog
               currentAssignedTo={task.assignedTo}
               availableMembers={availableMembers}
-              onAssignmentChange={(memberId) => onAssignmentChange(task.id, memberId)}
+              onAssignmentChange={(memberId) =>
+                onAssignmentChange(task.id, memberId)
+              }
               taskName={task.name}
             />
           </div>
@@ -369,9 +373,7 @@ export function TaskRow({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Avancement:</span>
-              <span className="text-xs font-medium">
-                {task.progress || 0}%
-              </span>
+              <span className="text-xs font-medium">{task.progress || 0}%</span>
             </div>
 
             {/* Progress Bar */}
@@ -379,7 +381,7 @@ export function TaskRow({
               <div
                 className={cn(
                   "h-2.5 rounded-full transition-all duration-300",
-                  getProgressColor(task.progress || 0)
+                  getProgressColor(task.progress || 0),
                 )}
                 style={{
                   width: `${task.progress || 0}%`,
@@ -393,7 +395,9 @@ export function TaskRow({
             <TaskAssignmentDialog
               currentAssignedTo={task.assignedTo}
               availableMembers={availableMembers}
-              onAssignmentChange={(memberId) => onAssignmentChange(task.id, memberId)}
+              onAssignmentChange={(memberId) =>
+                onAssignmentChange(task.id, memberId)
+              }
               taskName={task.name}
             />
             <Button

@@ -14,15 +14,17 @@ export default function NetworkStatusAlert() {
     backendReachable: true,
     error: undefined as string | undefined,
     lastCheck: Date.now(),
-    latency: undefined as number | undefined
+    latency: undefined as number | undefined,
   };
-  let checkConnectivity = async (): Promise<boolean> => { return true; };
+  let checkConnectivity = async (): Promise<boolean> => {
+    return true;
+  };
 
   try {
     const networkStatus = useNetworkStatus();
     status = {
       ...status,
-      ...networkStatus.status
+      ...networkStatus.status,
     };
     checkConnectivity = networkStatus.checkConnectivity;
   } catch (error) {

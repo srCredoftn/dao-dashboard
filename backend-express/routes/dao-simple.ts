@@ -78,7 +78,7 @@ router.get("/", authenticate, auditLog("VIEW_ALL_DAOS"), (req, res) => {
     }
 
     devLog.info(
-      `Serving ${filteredDaos.length} DAOs to ${req.user?.email} (${req.user?.role})`
+      `Serving ${filteredDaos.length} DAOs to ${req.user?.email} (${req.user?.role})`,
     );
     res.json(filteredDaos);
   } catch (error) {
@@ -459,8 +459,8 @@ router.put(
       const dao = daoStorage.findById(id)!;
 
       // Validate that all provided task IDs exist in the DAO
-      const existingTaskIds = dao.tasks.map(t => t.id);
-      const invalidIds = taskIds.filter(id => !existingTaskIds.includes(id));
+      const existingTaskIds = dao.tasks.map((t) => t.id);
+      const invalidIds = taskIds.filter((id) => !existingTaskIds.includes(id));
 
       if (invalidIds.length > 0) {
         return res.status(400).json({
@@ -471,8 +471,10 @@ router.put(
       }
 
       // Validate that all existing tasks are included in the reorder
-      if (taskIds.length !== dao.tasks.length ||
-          !existingTaskIds.every(id => taskIds.includes(id))) {
+      if (
+        taskIds.length !== dao.tasks.length ||
+        !existingTaskIds.every((id) => taskIds.includes(id))
+      ) {
         return res.status(400).json({
           error: "Task IDs must include all existing tasks",
           code: "INCOMPLETE_TASK_LIST",
@@ -480,8 +482,8 @@ router.put(
       }
 
       // Reorder tasks according to the provided order
-      const reorderedTasks = taskIds.map(taskId =>
-        dao.tasks.find(task => task.id === taskId)!
+      const reorderedTasks = taskIds.map(
+        (taskId) => dao.tasks.find((task) => task.id === taskId)!,
       );
 
       dao.tasks = reorderedTasks;
@@ -490,9 +492,7 @@ router.put(
       // Update the DAO in storage
       daoStorage.updateAtIndex(daoIndex, dao);
 
-      console.log(
-        `🔄 Reordered tasks in DAO ${id} by ${req.user?.email}`
-      );
+      console.log(`🔄 Reordered tasks in DAO ${id} by ${req.user?.email}`);
       res.json(dao);
     } catch (error) {
       console.error("Error in PUT /api/dao/:id/tasks/reorder:", error);
