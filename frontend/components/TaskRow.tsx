@@ -428,9 +428,10 @@ export function TaskRow({
           {/* Comments Section */}
           <div className="pt-2 border-t border-gray-100">
             <TaskComments
-              task={task}
               daoId={daoId}
-              onCommentChange={onCommentChange}
+              taskId={task.id}
+              taskName={task.name}
+              availableMembers={availableMembers}
             />
           </div>
         </div>
