@@ -10,7 +10,7 @@ export default function NetworkStatusAlert() {
 
   // Protection contre les erreurs de hook
   let status = { isOnline: true, backendReachable: true };
-  let checkConnectivity = async () => {};
+  let checkConnectivity = async (): Promise<boolean> => { return true; };
 
   try {
     const networkStatus = useNetworkStatus();
