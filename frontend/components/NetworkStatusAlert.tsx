@@ -9,7 +9,13 @@ export default function NetworkStatusAlert() {
   const [isRetrying, setIsRetrying] = useState(false);
 
   // Protection contre les erreurs de hook
-  let status = { isOnline: true, backendReachable: true };
+  let status = {
+    isOnline: true,
+    backendReachable: true,
+    error: undefined as string | undefined,
+    lastCheck: Date.now(),
+    latency: undefined as number | undefined
+  };
   let checkConnectivity = async (): Promise<boolean> => { return true; };
 
   try {
