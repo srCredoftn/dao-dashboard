@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Wifi, WifiOff, AlertCircle, RefreshCw } from "lucide-react";
+import { WifiOff, AlertCircle, RefreshCw } from "lucide-react";
 import { useNetworkStatus } from "@/utils/network-debug";
 
 export default function NetworkStatusAlert() {
@@ -9,12 +9,23 @@ export default function NetworkStatusAlert() {
   const [isRetrying, setIsRetrying] = useState(false);
 
   // Protection contre les erreurs de hook
-  let status = { isOnline: true, backendReachable: true };
-  let checkConnectivity = async () => {};
+  let status = {
+    isOnline: true,
+    backendReachable: true,
+    error: undefined as string | undefined,
+    lastCheck: Date.now(),
+    latency: undefined as number | undefined,
+  };
+  let checkConnectivity = async (): Promise<boolean> => {
+    return true;
+  };
 
   try {
     const networkStatus = useNetworkStatus();
-    status = networkStatus.status;
+    status = {
+      ...status,
+      ...networkStatus.status,
+    };
     checkConnectivity = networkStatus.checkConnectivity;
   } catch (error) {
     console.warn("NetworkStatusAlert: Could not access network status hook");
@@ -42,7 +53,7 @@ export default function NetworkStatusAlert() {
     return null;
   }
 
-  // Déterminer le type d'alerte et le message
+  // D��terminer le type d'alerte et le message
   let alertType: "default" | "destructive" = "destructive";
   let icon = <WifiOff className="h-4 w-4" />;
   let title = "";

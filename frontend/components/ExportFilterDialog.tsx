@@ -241,5 +241,3 @@ export default function ExportFilterDialog({
     </Dialog>
   );
 }
-
-export type { ExportOptions };

@@ -50,6 +50,7 @@ import TaskAssignmentDialog from "@/components/TaskAssignmentDialog";
 import TaskComments from "@/components/TaskComments";
 import TaskMenuButton from "@/components/TaskMenuButton";
 import AddTaskButton from "@/components/AddTaskButton";
+import { TaskRow } from "@/components/TaskRow";
 import ExportFilterDialog, {
   type ExportOptions,
 } from "@/components/ExportFilterDialog";
@@ -68,383 +69,6 @@ function getStatusColor(status: DaoStatus): string {
   }
 }
 
-function TaskRow({
-  task,
-  daoId,
-  onProgressChange,
-  onCommentChange,
-  onApplicableChange,
-  onAssignmentChange,
-  onTaskUpdate,
-  onTaskDelete,
-  availableMembers,
-  daysDiff,
-  taskIndex,
-}: {
-  task: DaoTask;
-  daoId: string;
-  onProgressChange: (taskId: number, progress: number | null) => void;
-  onCommentChange: (taskId: number, comment: string) => void;
-  onApplicableChange: (taskId: number, applicable: boolean) => void;
-  onAssignmentChange: (taskId: number, memberId?: string) => void;
-  onTaskUpdate: (taskId: number, updates: Partial<DaoTask>) => void;
-  onTaskDelete: (taskId: number) => void;
-  availableMembers: TeamMember[];
-  daysDiff: number;
-  taskIndex: number;
-}) {
-  const { user, isAdmin } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [tempProgress, setTempProgress] = useState(task.progress || 0);
-  const [tempComment, setTempComment] = useState(task.comment || "");
-
-  const handleSave = () => {
-    onProgressChange(task.id, tempProgress);
-    onCommentChange(task.id, tempComment);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setTempProgress(task.progress || 0);
-    setTempComment(task.comment || "");
-    setIsEditing(false);
-  };
-
-  const getProgressColor = (progress: number): string => {
-    // Logique conditionnelle prioritaire :
-    // 1. Si % d'avancement = 100% → Gris (priorité absolue)
-    if (progress === 100) return "bg-gray-400";
-
-    // 2. Si date dépassée (daysDiff < 0) → Rouge
-    if (daysDiff < 0) return "bg-red-500";
-
-    // 3. Si Date dépôt - Date aujourd'hui ≥ 5 jours → Vert
-    if (daysDiff >= 5) return "bg-green-500";
-
-    // 4. Si Date dépôt - Date aujourd'hui ≤ 3 jours → Rouge
-    if (daysDiff <= 3) return "bg-red-500";
-
-    // 5. Sinon (entre 4 et 5 jours) → Bleu
-    return "bg-blue-500";
-  };
-
-  const getSliderColor = (progress: number): string => {
-    // Même logique que getProgressColor mais retourne des codes couleur hex
-    if (progress === 100) return "#9ca3af"; // gris
-    if (daysDiff < 0) return "#ef4444"; // rouge pour dates dépassées
-    if (daysDiff >= 5) return "#10b981"; // vert
-    if (daysDiff <= 3) return "#ef4444"; // rouge
-    return "#3b82f6"; // bleu
-  };
-
-  // If not applicable, show simple layout
-  if (!task.isApplicable) {
-    return (
-      <div className="bg-white rounded-lg border p-3 sm:p-4">
-        {/* Mobile: Vertical layout */}
-        <div className="block sm:hidden space-y-3">
-          <div className="flex items-start gap-2">
-            <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full flex-shrink-0">
-              {taskIndex}
-            </span>
-            <h4 className="font-medium text-sm flex-1 min-w-0 break-words">
-              {task.name}
-            </h4>
-          </div>
-
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-            <span className="text-xs text-muted-foreground">Applicable:</span>
-            <div className="flex items-center gap-2">
-              {isAdmin() ? (
-                <Switch
-                  checked={task.isApplicable}
-                  onCheckedChange={(checked) =>
-                    onApplicableChange(task.id, checked)
-                  }
-                />
-              ) : (
-                <span className="text-xs font-medium">Non</span>
-              )}
-            </div>
-          </div>
-
-          <div className="text-center py-2">
-            <span className="text-sm text-muted-foreground italic">
-              Non applicable
-            </span>
-          </div>
-        </div>
-
-        {/* Desktop: Horizontal layout */}
-        <div className="hidden sm:block">
-          <div className="flex items-center justify-between">
-            <h4 className="font-medium text-sm">
-              <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full mr-2">
-                {taskIndex}
-              </span>
-              {task.name}
-            </h4>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Applicable:</span>
-              {isAdmin() ? (
-                <Switch
-                  checked={task.isApplicable}
-                  onCheckedChange={(checked) =>
-                    onApplicableChange(task.id, checked)
-                  }
-                />
-              ) : (
-                <span className="text-xs font-medium">Non</span>
-              )}
-            </div>
-          </div>
-          <div className="mt-4 text-center">
-            <span className="text-sm text-muted-foreground">
-              Non applicable
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-white rounded-lg border p-3 sm:p-4">
-      {/* Mobile: Vertical layout */}
-      <div className="block sm:hidden space-y-3">
-        <div className="flex items-start gap-2">
-          <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full flex-shrink-0">
-            {taskIndex}
-          </span>
-          <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-sm break-words">{task.name}</h4>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-          <span className="text-xs text-muted-foreground">Applicable:</span>
-          <div className="flex items-center gap-2">
-            {isAdmin() ? (
-              <Switch
-                checked={task.isApplicable}
-                onCheckedChange={(checked) =>
-                  onApplicableChange(task.id, checked)
-                }
-              />
-            ) : (
-              <span className="text-xs font-medium">
-                {task.isApplicable ? "Oui" : "Non"}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop: Horizontal layout */}
-      <div className="hidden sm:block">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-sm">
-              <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full mr-2">
-                {taskIndex}
-              </span>
-              {task.name}
-            </h4>
-          </div>
-
-          <div className="flex items-center gap-3 ml-4">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Applicable:</span>
-              {isAdmin() ? (
-                <Switch
-                  checked={task.isApplicable}
-                  onCheckedChange={(checked) =>
-                    onApplicableChange(task.id, checked)
-                  }
-                />
-              ) : (
-                <span className="text-xs font-medium">
-                  {task.isApplicable ? "Oui" : "Non"}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Edit Mode with Slider */}
-      {isEditing && (
-        <div className="space-y-4 pt-4 border-t border-gray-200">
-          {/* Progress Slider Section */}
-          <div className="space-y-3">
-            <label className="text-xs font-medium text-muted-foreground block">
-              Ajuster le pourcentage:
-            </label>
-            <div className="px-2 sm:px-4">
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={tempProgress}
-                onChange={(e) => setTempProgress(Number(e.target.value))}
-                className="w-full h-2.5 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                style={{
-                  background: `linear-gradient(to right, ${getSliderColor(tempProgress)} 0%, ${getSliderColor(tempProgress)} ${tempProgress}%, #e5e7eb ${tempProgress}%, #e5e7eb 100%)`,
-                }}
-              />
-              <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                <span className="font-medium">0%</span>
-                <span className="font-bold text-primary">{tempProgress}%</span>
-                <span className="font-medium">100%</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Comment Section */}
-          <div className="space-y-3">
-            <label className="text-xs font-medium text-muted-foreground block">
-              Commentaire/Observation:
-            </label>
-            <Textarea
-              value={tempComment}
-              onChange={(e) => setTempComment(e.target.value)}
-              placeholder="Ajouter un commentaire ou une observation..."
-              className="text-sm resize-none min-h-[80px] border-gray-300 focus:border-primary"
-              rows={3}
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <div className="flex gap-2 order-2 sm:order-1">
-              {/* Task Assignment - Admin only */}
-              {isAdmin() && (
-                <TaskAssignmentDialog
-                  currentAssignedTo={task.assignedTo}
-                  availableMembers={availableMembers}
-                  onAssignmentChange={(memberId) =>
-                    onAssignmentChange(task.id, memberId)
-                  }
-                  taskName={task.name}
-                />
-              )}
-            </div>
-
-            <div className="flex gap-2 ml-auto order-1 sm:order-2">
-              <Button
-                variant="outline"
-                onClick={handleCancel}
-                size="sm"
-                className="flex-1 sm:flex-none"
-              >
-                Annuler
-              </Button>
-              <Button
-                onClick={handleSave}
-                size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-none"
-              >
-                Sauvegarder
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Progress Bar - Now comes first */}
-      {task.isApplicable && (
-        <div className="space-y-2 pt-3 border-t border-gray-100">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground font-medium">
-              Progression
-            </span>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-primary">
-                {isEditing ? tempProgress : task.progress || 0}%
-              </span>
-              {isAdmin() && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="h-6 w-6 p-0 flex-shrink-0"
-                >
-                  <Edit3 className="h-3 w-3" />
-                </Button>
-              )}
-            </div>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div
-              className={cn(
-                "h-2.5 rounded-full transition-all duration-300",
-                getProgressColor(isEditing ? tempProgress : task.progress || 0),
-              )}
-              style={{
-                width: `${isEditing ? tempProgress : task.progress || 0}%`,
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Assignment Section - Now comes after progression */}
-      {task.isApplicable && !isEditing && (
-        <div className="pt-3 border-t border-gray-100">
-          {isAdmin() ? (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <span className="text-xs font-medium text-muted-foreground">
-                Assignation:
-              </span>
-              <TaskAssignmentDialog
-                currentAssignedTo={task.assignedTo}
-                availableMembers={availableMembers}
-                onAssignmentChange={(memberId) =>
-                  onAssignmentChange(task.id, memberId)
-                }
-                taskName={task.name}
-              />
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-              <span className="text-xs font-medium text-muted-foreground">
-                Assigné à:
-              </span>
-              <span className="text-xs font-medium">
-                {task.assignedTo
-                  ? availableMembers.find((m) => m.id === task.assignedTo)
-                      ?.name || "Utilisateur inconnu"
-                  : "Non assigné"}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Comments section - always show when not editing, now after progress bar */}
-      {!isEditing && (
-        <div className="pt-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1 min-w-0">
-              <TaskComments
-                daoId={daoId}
-                taskId={task.id}
-                taskName={task.name}
-                availableMembers={availableMembers}
-              />
-            </div>
-            <TaskMenuButton
-              task={task}
-              onTaskUpdate={onTaskUpdate}
-              onTaskDelete={onTaskDelete}
-            />
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function DaoDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -455,6 +79,10 @@ export default function DaoDetail() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditingAuthority, setIsEditingAuthority] = useState(false);
   const [tempAuthority, setTempAuthority] = useState("");
+
+  // Drag and drop states
+  const [draggedTaskId, setDraggedTaskId] = useState<number | null>(null);
+  const [dragOverTaskId, setDragOverTaskId] = useState<number | null>(null);
 
   // Debouncing pour optimiser les performances
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -769,6 +397,74 @@ export default function DaoDetail() {
       devLog.error("Error updating task assignment:", error);
       setError("Failed to update task assignment");
     }
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, taskId: number) => {
+    setDraggedTaskId(taskId);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", taskId.toString());
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    setDraggedTaskId(null);
+    setDragOverTaskId(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    setDragOverTaskId(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetTaskId: number) => {
+    e.preventDefault();
+
+    if (!dao || !draggedTaskId || draggedTaskId === targetTaskId) {
+      return;
+    }
+
+    try {
+      // Find current positions
+      const draggedIndex = dao.tasks.findIndex(t => t.id === draggedTaskId);
+      const targetIndex = dao.tasks.findIndex(t => t.id === targetTaskId);
+
+      if (draggedIndex === -1 || targetIndex === -1) {
+        return;
+      }
+
+      // Create new task order
+      const newTasks = [...dao.tasks];
+      const [movedTask] = newTasks.splice(draggedIndex, 1);
+      newTasks.splice(targetIndex, 0, movedTask);
+
+      // Update local state immediately for better UX
+      setDao(prev => prev ? { ...prev, tasks: newTasks } : prev);
+
+      // Send reorder request to backend
+      const taskIds = newTasks.map(task => task.id);
+      const updatedDao = await taskService.reorderTasks(dao.id, taskIds);
+      setDao(updatedDao);
+
+      devLog.log(`✅ Tasks reordered successfully`);
+    } catch (error) {
+      devLog.error("Error reordering tasks:", error);
+      setError("Failed to reorder tasks");
+
+      // Reload to revert optimistic update
+      try {
+        const freshDao = await apiService.getDaoById(dao.id);
+        setDao(freshDao);
+      } catch (reloadError) {
+        devLog.error("Error reloading DAO after failed reorder:", reloadError);
+      }
+    }
+
+    setDraggedTaskId(null);
+    setDragOverTaskId(null);
   };
 
   const handleExportWithOptions = (options: ExportOptions) => {
@@ -1377,6 +1073,16 @@ export default function DaoDetail() {
                     availableMembers={dao.equipe}
                     daysDiff={dateInfo.daysDiff}
                     taskIndex={displayIndex}
+                    isDragging={draggedTaskId === task.id}
+                    isDragOver={dragOverTaskId === task.id}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => {
+                      handleDragOver(e);
+                      setDragOverTaskId(task.id);
+                    }}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
                   />
                 );
               })}

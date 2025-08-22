@@ -1,4 +1,4 @@
-import { Suspense, ComponentType, ReactNode } from "react";
+import { Suspense, ComponentType, ReactNode, lazy } from "react";
 import { Loader2 } from "lucide-react";
 
 interface LazyLoaderProps {
@@ -6,7 +6,7 @@ interface LazyLoaderProps {
   fallback?: ReactNode;
 }
 
-// Composant de fallback par défaut avec un spinner élégant
+// Composant de fallback par défaut avec un spinner ��légant
 const DefaultFallback = () => (
   <div className="flex items-center justify-center min-h-[400px] w-full">
     <div className="flex flex-col items-center space-y-4">

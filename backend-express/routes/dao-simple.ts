@@ -8,7 +8,7 @@ import {
   auditLog,
   sensitiveOperationLimit,
 } from "../middleware/auth";
-import { devLog, apiLog } from "../utils/devLog";
+import { devLog } from "../utils/devLog";
 import { DEFAULT_TASKS } from "@shared/dao";
 import type { Dao } from "@shared/dao";
 
@@ -77,15 +77,13 @@ router.get("/", authenticate, auditLog("VIEW_ALL_DAOS"), (req, res) => {
       filteredDaos = daoStorage.getAll(); // For now, all users see all DAOs
     }
 
-    apiLog.response(
+    devLog.info(
       `Serving ${filteredDaos.length} DAOs to ${req.user?.email} (${req.user?.role})`,
-      "GET",
-      "/api/dao",
     );
     res.json(filteredDaos);
   } catch (error) {
     devLog.error("Error in GET /api/dao:", error);
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to fetch DAOs",
       code: "FETCH_ERROR",
     });
@@ -419,6 +417,88 @@ router.delete(
       res.status(500).json({
         error: "Failed to delete DAO",
         code: "DELETE_ERROR",
+      });
+    }
+  },
+);
+
+// PUT /api/dao/:id/tasks/reorder - Reorder tasks
+router.put(
+  "/:id/tasks/reorder",
+  authenticate,
+  requireUser,
+  auditLog("REORDER_TASKS"),
+  (req, res) => {
+    try {
+      const { id } = req.params;
+      const { taskIds } = req.body;
+
+      // Validate parameters
+      if (!id || id.length > 100) {
+        return res.status(400).json({
+          error: "Invalid DAO ID",
+          code: "INVALID_DAO_ID",
+        });
+      }
+
+      if (!Array.isArray(taskIds) || taskIds.length === 0) {
+        return res.status(400).json({
+          error: "Invalid task IDs array",
+          code: "INVALID_TASK_IDS",
+        });
+      }
+
+      const daoIndex = daoStorage.findIndexById(id);
+      if (daoIndex === -1) {
+        return res.status(404).json({
+          error: "DAO not found",
+          code: "DAO_NOT_FOUND",
+        });
+      }
+
+      const dao = daoStorage.findById(id)!;
+
+      // Validate that all provided task IDs exist in the DAO
+      const existingTaskIds = dao.tasks.map((t) => t.id);
+      const invalidIds = taskIds.filter((id) => !existingTaskIds.includes(id));
+
+      if (invalidIds.length > 0) {
+        return res.status(400).json({
+          error: "Some task IDs do not exist",
+          code: "INVALID_TASK_IDS",
+          invalidIds,
+        });
+      }
+
+      // Validate that all existing tasks are included in the reorder
+      if (
+        taskIds.length !== dao.tasks.length ||
+        !existingTaskIds.every((id) => taskIds.includes(id))
+      ) {
+        return res.status(400).json({
+          error: "Task IDs must include all existing tasks",
+          code: "INCOMPLETE_TASK_LIST",
+        });
+      }
+
+      // Reorder tasks according to the provided order
+      const reorderedTasks = taskIds.map(
+        (taskId) => dao.tasks.find((task) => task.id === taskId)!,
+      );
+
+      dao.tasks = reorderedTasks;
+      dao.updatedAt = new Date().toISOString();
+
+      // Update the DAO in storage
+      daoStorage.updateAtIndex(daoIndex, dao);
+
+      console.log(`🔄 Reordered tasks in DAO ${id} by ${req.user?.email}`);
+      res.json(dao);
+    } catch (error) {
+      console.error("Error in PUT /api/dao/:id/tasks/reorder:", error);
+      res.status(500).json({
+        error: "Failed to reorder tasks",
+        code: "REORDER_ERROR",
       });
     }
   },
