@@ -8,7 +8,7 @@ import {
   auditLog,
   sensitiveOperationLimit,
 } from "../middleware/auth";
-import { devLog, apiLog } from "../utils/devLog";
+import { devLog } from "../utils/devLog";
 import { DEFAULT_TASKS } from "@shared/dao";
 import type { Dao } from "@shared/dao";
 
