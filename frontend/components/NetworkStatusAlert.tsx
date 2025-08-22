@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Wifi, WifiOff, AlertCircle, RefreshCw } from "lucide-react";
+import { WifiOff, AlertCircle, RefreshCw } from "lucide-react";
 import { useNetworkStatus } from "@/utils/network-debug";
 
 export default function NetworkStatusAlert() {
@@ -51,7 +51,7 @@ export default function NetworkStatusAlert() {
     return null;
   }
 
-  // Déterminer le type d'alerte et le message
+  // D��terminer le type d'alerte et le message
   let alertType: "default" | "destructive" = "destructive";
   let icon = <WifiOff className="h-4 w-4" />;
   let title = "";
