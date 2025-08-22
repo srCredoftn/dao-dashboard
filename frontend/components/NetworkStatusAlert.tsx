@@ -20,7 +20,10 @@ export default function NetworkStatusAlert() {
 
   try {
     const networkStatus = useNetworkStatus();
-    status = networkStatus.status;
+    status = {
+      ...status,
+      ...networkStatus.status
+    };
     checkConnectivity = networkStatus.checkConnectivity;
   } catch (error) {
     console.warn("NetworkStatusAlert: Could not access network status hook");
