@@ -5,9 +5,9 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { TaskAssignmentDialog } from "./TaskAssignmentDialog";
-import { TaskComments } from "./TaskComments";
-import { TaskMenuButton } from "./TaskMenuButton";
+import TaskAssignmentDialog from "./TaskAssignmentDialog";
+import TaskComments from "./TaskComments";
+import TaskMenuButton from "./TaskMenuButton";
 import { useAuth } from "@/contexts/AuthContext";
 import type { DaoTask, TeamMember } from "@shared/dao";
 
