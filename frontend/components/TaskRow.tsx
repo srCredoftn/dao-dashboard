@@ -358,9 +358,10 @@ export function TaskRow({
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">Assigné à:</span>
             <TaskAssignmentDialog
-              task={task}
+              currentAssignedTo={task.assignedTo}
               availableMembers={availableMembers}
-              onAssignmentChange={onAssignmentChange}
+              onAssignmentChange={(memberId) => onAssignmentChange(task.id, memberId)}
+              taskName={task.name}
             />
           </div>
 
