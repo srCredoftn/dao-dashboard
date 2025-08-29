@@ -49,8 +49,15 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // Logging middleware
 app.use(logger);
 
-// Health check endpoint
+// Health check endpoints
 app.get("/health", (req, res) => {
+  res.json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+app.get("/api/health", (req, res) => {
   res.json({
     status: "OK",
     timestamp: new Date().toISOString(),
