@@ -14,7 +14,7 @@ export default defineConfig({
     port: 8080,
     proxy: {
       "/api": {
-        target: "http://localhost:3001", // Express backend port
+        target: "http://localhost:5000", // MongoDB backend port
         changeOrigin: true,
         secure: false,
       },
