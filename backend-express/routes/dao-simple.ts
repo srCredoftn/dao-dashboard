@@ -83,7 +83,7 @@ router.get("/", authenticate, auditLog("VIEW_ALL_DAOS"), (req, res) => {
     res.json(filteredDaos);
   } catch (error) {
     devLog.error("Error in GET /api/dao:", error);
-    return res.status(500).json({
+    return void res.status(500).json({
       error: "Failed to fetch DAOs",
       code: "FETCH_ERROR",
     });
@@ -97,7 +97,7 @@ router.get("/next-number", authenticate, (req, res) => {
 
     // Validate year is reasonable
     if (year < 2020 || year > 2100) {
-      return res.status(400).json({
+      return void res.status(400).json({
         error: "Invalid year",
         code: "INVALID_YEAR",
       });
@@ -110,7 +110,7 @@ router.get("/next-number", authenticate, (req, res) => {
     });
 
     if (currentYearDaos.length === 0) {
-      return res.json({ nextNumber: `DAO-${year}-001` });
+      return void res.json({ nextNumber: `DAO-${year}-001` });
     }
 
     // Extract numbers safely
@@ -125,7 +125,7 @@ router.get("/next-number", authenticate, (req, res) => {
 
     // Validate next number is reasonable
     if (nextNumber > 999) {
-      return res.status(400).json({
+      return void res.status(400).json({
         error: "Too many DAOs for this year",
         code: "YEAR_LIMIT_EXCEEDED",
       });
@@ -153,7 +153,7 @@ router.get("/:id", authenticate, (req, res) => {
 
     // Basic ID validation
     if (!id || id.length > 100) {
-      return res.status(400).json({
+      return void res.status(400).json({
         error: "Invalid DAO ID",
         code: "INVALID_ID",
       });
@@ -161,17 +161,17 @@ router.get("/:id", authenticate, (req, res) => {
 
     const dao = daoStorage.findById(id);
     if (!dao) {
-      return res.status(404).json({
+      return void res.status(404).json({
         error: "DAO not found",
         code: "DAO_NOT_FOUND",
       });
     }
 
     console.log(`📄 Serving DAO ${id} to ${req.user?.email}`);
-    return res.json(dao);
+    return void res.json(dao);
   } catch (error) {
     console.error("Error in GET /api/dao/:id:", error);
-    return res.status(500).json({
+    return void res.status(500).json({
       error: "Failed to fetch DAO",
       code: "FETCH_ERROR",
     });
@@ -192,7 +192,7 @@ router.post(
 
       // Additional security checks
       if (daoStorage.size() > 10000) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Maximum number of DAOs reached",
           code: "STORAGE_LIMIT",
         });
@@ -204,7 +204,7 @@ router.post(
         .find((dao) => dao.numeroListe === validatedData.numeroListe);
 
       if (existingDao) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "DAO number already exists",
           code: "DUPLICATE_NUMBER",
         });
@@ -252,7 +252,7 @@ router.post(
       res.status(201).json(newDao);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Validation error",
           details: error.errors.map((e) => ({
             field: e.path.join("."),
@@ -283,7 +283,7 @@ router.put(
 
       // Basic ID validation
       if (!id || id.length > 100) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid DAO ID",
           code: "INVALID_ID",
         });
@@ -293,7 +293,7 @@ router.put(
       const index = daoStorage.findIndexById(id);
 
       if (index === -1) {
-        return res.status(404).json({
+        return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
@@ -309,7 +309,7 @@ router.put(
           );
 
         if (existingDao) {
-          return res.status(400).json({
+          return void res.status(400).json({
             error: "DAO number already exists",
             code: "DUPLICATE_NUMBER",
           });
@@ -355,7 +355,7 @@ router.put(
       res.json(updatedDao);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Validation error",
           details: error.errors.map((e) => ({
             field: e.path.join("."),
@@ -387,7 +387,7 @@ router.delete(
 
       // Basic ID validation
       if (!id || id.length > 100) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid DAO ID",
           code: "INVALID_ID",
         });
@@ -396,7 +396,7 @@ router.delete(
       const index = daoStorage.findIndexById(id);
 
       if (index === -1) {
-        return res.status(404).json({
+        return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
@@ -435,14 +435,14 @@ router.put(
 
       // Validate parameters
       if (!id || id.length > 100) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid DAO ID",
           code: "INVALID_DAO_ID",
         });
       }
 
       if (!Array.isArray(taskIds) || taskIds.length === 0) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid task IDs array",
           code: "INVALID_TASK_IDS",
         });
@@ -450,7 +450,7 @@ router.put(
 
       const daoIndex = daoStorage.findIndexById(id);
       if (daoIndex === -1) {
-        return res.status(404).json({
+        return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
@@ -463,7 +463,7 @@ router.put(
       const invalidIds = taskIds.filter((id) => !existingTaskIds.includes(id));
 
       if (invalidIds.length > 0) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Some task IDs do not exist",
           code: "INVALID_TASK_IDS",
           invalidIds,
@@ -475,7 +475,7 @@ router.put(
         taskIds.length !== dao.tasks.length ||
         !existingTaskIds.every((id) => taskIds.includes(id))
       ) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Task IDs must include all existing tasks",
           code: "INCOMPLETE_TASK_LIST",
         });
@@ -516,7 +516,7 @@ router.put(
 
       // Validate parameters
       if (!id || id.length > 100) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid DAO ID",
           code: "INVALID_DAO_ID",
         });
@@ -524,7 +524,7 @@ router.put(
 
       const parsedTaskId = parseInt(taskId);
       if (isNaN(parsedTaskId) || parsedTaskId < 1) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid task ID",
           code: "INVALID_TASK_ID",
         });
@@ -534,7 +534,7 @@ router.put(
       const daoIndex = daoStorage.findIndexById(id);
 
       if (daoIndex === -1) {
-        return res.status(404).json({
+        return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
@@ -544,7 +544,7 @@ router.put(
       const task = dao.tasks.find((t) => t.id === parsedTaskId);
 
       if (!task) {
-        return res.status(404).json({
+        return void res.status(404).json({
           error: "Task not found",
           code: "TASK_NOT_FOUND",
         });
@@ -577,7 +577,7 @@ router.put(
       res.json(dao);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Validation error",
           details: error.errors.map((e) => ({
             field: e.path.join("."),
