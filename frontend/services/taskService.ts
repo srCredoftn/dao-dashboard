@@ -137,10 +137,7 @@ class TaskService {
   }
 
   // Reorder tasks
-  async reorderTasks(
-    daoId: string,
-    taskIds: number[],
-  ): Promise<Dao> {
+  async reorderTasks(daoId: string, taskIds: number[]): Promise<Dao> {
     return this.request<Dao>(`/${daoId}/tasks/reorder`, {
       method: "PUT",
       body: JSON.stringify({ taskIds }),

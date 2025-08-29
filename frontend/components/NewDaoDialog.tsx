@@ -43,7 +43,6 @@ import {
 import { apiService } from "@/services/api";
 import { authService } from "@/services/authService";
 
-
 const SAMPLE_AUTHORITIES = [
   "Mairie de Lyon",
   "Conseil Régional Auvergne-Rhône-Alpes",
@@ -269,7 +268,6 @@ export default function NewDaoDialog({
       };
 
       await onCreateDao(newDao);
-
 
       // Reset form only after successful creation
       setFormData({

@@ -1,12 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  FileText,
-  Download,
-  Trash2,
-  Edit3,
-} from "lucide-react";
+import { ArrowLeft, FileText, Download, Trash2, Edit3 } from "lucide-react";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 // jsPDF import dynamique pour réduire la taille du bundle initial
 import { Button } from "@/components/ui/button";
@@ -38,7 +32,6 @@ import ExportFilterDialog, {
   type ExportOptions,
 } from "@/components/ExportFilterDialog";
 import { useAuth } from "@/contexts/AuthContext";
-
 
 export default function DaoDetail() {
   const { id } = useParams<{ id: string }>();
@@ -280,14 +273,9 @@ export default function DaoDetail() {
         };
       });
 
-
       if (updates.name !== undefined) {
         // Update task name
-        await taskService.updateTaskName(
-          dao.id,
-          taskId,
-          updates.name,
-        );
+        await taskService.updateTaskName(dao.id, taskId, updates.name);
       } else {
         // Update other task properties
         await taskService.updateTask(dao.id, taskId, {

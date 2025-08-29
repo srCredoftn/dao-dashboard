@@ -10,8 +10,7 @@ import {
 import { useNotifications } from "@/contexts/NotificationContext";
 
 export default function NotificationCenter() {
-  const { notifications, unreadCount, removeNotification } =
-    useNotifications();
+  const { notifications, unreadCount, removeNotification } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
