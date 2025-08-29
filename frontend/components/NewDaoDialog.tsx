@@ -42,7 +42,6 @@ import {
 } from "@shared/dao";
 import { apiService } from "@/services/api";
 import { authService } from "@/services/authService";
-import { notificationService } from "@/services/notificationService";
 
 
 const SAMPLE_AUTHORITIES = [
