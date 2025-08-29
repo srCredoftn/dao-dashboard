@@ -12,7 +12,7 @@
   },
   "scripts": {
     "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
-    "dev:backend": "pnpm run dev:backend:mongo",
+    "dev:backend": "pnpm run dev:backend:express",
     "dev:backend:express": "tsx backend-express/server.ts",
     "dev:backend:mongo": "cd backend-mongodb && pnpm install && pnpm dev",
     "dev:frontend": "vite",
