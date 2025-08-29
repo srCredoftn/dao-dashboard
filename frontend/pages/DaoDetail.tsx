@@ -1090,7 +1090,6 @@ export default function DaoDetail() {
               {/* Add Task Button */}
               <AddTaskButton
                 onTaskAdd={handleTaskAdd}
-                existingTaskIds={dao.tasks.map((t) => t.id)}
                 canManage={
                   isAdmin() ||
                   dao.equipe.some(
