@@ -13,7 +13,7 @@ export default function NetworkStatusAlert() {
     isOnline: true,
     backendReachable: true,
     error: undefined as string | undefined,
-    lastCheck: Date.now(),
+    lastCheck: new Date().toISOString(),
     latency: undefined as number | undefined,
   };
   let checkConnectivity = async (): Promise<boolean> => {
