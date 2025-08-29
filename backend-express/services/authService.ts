@@ -143,10 +143,10 @@ export class AuthService {
         authUser,
         JWT_SECRET as jwt.Secret,
         {
-          expiresIn: JWT_EXPIRES_IN as unknown as jwt.StringValue | number,
+          expiresIn: JWT_EXPIRES_IN as any,
           issuer: "dao-management",
           audience: "dao-app",
-        } as jwt.SignOptions,
+        } as any,
       );
 
       // Track active session
