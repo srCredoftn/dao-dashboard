@@ -323,7 +323,7 @@ export default secureFetch;
 
 // Fonction utilitaire pour remplacer window.fetch dans les cas critiques
 export function createFetchPolyfill(): typeof fetch {
-  return secureFetch.fetch.bind(secureFetch);
+  return secureFetch.fetch.bind(secureFetch) as unknown as typeof fetch;
 }
 
 // Hook pour diagnostiquer les problèmes de fetch
