@@ -131,6 +131,20 @@ export function createServer() {
     });
   });
 
+  // SMTP health endpoint
+  app.get("/api/health/smtp", async (_req, res) => {
+    try {
+      const { verifySmtp } = await import("./utils/mailer");
+      const result = await verifySmtp();
+      if (!result.ok) {
+        return res.status(500).json({ ok: false, error: result.message });
+      }
+      return res.json({ ok: true });
+    } catch (e) {
+      return res.status(500).json({ ok: false, error: (e as Error).message });
+    }
+  });
+
   // Example API routes
   app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "pong - secure";
