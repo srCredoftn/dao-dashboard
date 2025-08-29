@@ -1,4 +1,4 @@
-import type { Dao, DaoTask } from "@shared/dao";
+import type { Dao } from "@shared/dao";
 
 const API_BASE_URL = "/api/dao";
 
