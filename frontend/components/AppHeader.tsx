@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import {
@@ -10,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { User, LogOut, Settings, Shield, Users, Menu, X } from "lucide-react";
+import { User, LogOut, Settings, Shield, Users, X } from "lucide-react";
 import NotificationCenter from "./NotificationCenter";
 
 interface AppHeaderProps {
