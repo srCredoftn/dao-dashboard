@@ -1,4 +1,4 @@
-import type { AuthUser, Dao, TeamMember } from "@shared/dao";
+import type { AuthUser, Dao } from "@shared/dao";
 
 export interface Notification {
   id: string;
