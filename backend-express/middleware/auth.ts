@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../services/authService";
+import { daoStorage } from "../data/daoStorage";
 import type { AuthUser, UserRole } from "@shared/dao";
 
 // Extend Request type to include user
@@ -96,6 +97,36 @@ export function authorize(roles: UserRole[]) {
 
 // Admin-only middleware
 export const requireAdmin = authorize(["admin"]);
+
+// Admin or DAO team lead middleware (by DAO id in params)
+export function requireDaoLeaderOrAdmin(paramKey: string) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required", code: "NO_USER_CONTEXT" });
+    }
+    // Admin passes immediately
+    if (req.user.role === "admin") return next();
+
+    const daoId = req.params[paramKey];
+    if (!daoId) {
+      return res.status(400).json({ error: "DAO ID missing", code: "MISSING_DAO_ID" });
+    }
+    const dao = daoStorage.findById(daoId);
+    if (!dao) {
+      return res.status(404).json({ error: "DAO not found", code: "DAO_NOT_FOUND" });
+    }
+
+    const isLeader = dao.equipe.some(
+      (m) => m.id === req.user!.id && m.role === "chef_equipe",
+    );
+
+    if (!isLeader) {
+      return res.status(403).json({ error: "Insufficient permissions", code: "NOT_LEADER" });
+    }
+
+    next();
+  };
+}
 
 // Admin or user middleware (excludes viewers if they exist)
 export const requireUser = authorize(["admin", "user"]);
