@@ -221,16 +221,27 @@ router.post("/forgot-password", async (req, res) => {
       });
     }
 
-    // In production, send email here
-    // For development, we'll return the token in the response
-    devLog.info(`📧 Password reset code generated for ${email}`);
+    // Send email with SMTP (fallbacks ensure no crash in dev)
+    try {
+      const { EmailService } = await import("../services/emailService");
+      const result = await EmailService.sendPasswordResetEmail(email, token);
+      devLog.info(
+        `📧 Password reset email queued for ${email} (messageId: ${result.messageId})`,
+      );
+    } catch (mailErr) {
+      devLog.error("SMTP send error:", mailErr);
+      // Do not leak details; still respond success to avoid account enumeration and UX issues
+    }
 
-    return res.json({
+    const response: any = {
       message:
-        "Un code de réinitialisation a ét�� envoyé à votre adresse email.",
-      // Remove this in production - only for development
-      developmentToken: token,
-    });
+        "Un code de réinitialisation a été envoyé à votre adresse email.",
+    };
+    if (process.env.NODE_ENV !== "production") {
+      response.developmentToken = token;
+    }
+
+    return res.json(response);
   } catch (error) {
     devLog.error("Forgot password error:", error);
     return res
