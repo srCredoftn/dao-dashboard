@@ -289,19 +289,20 @@ export default function DaoDetail() {
         };
       });
 
-      let updatedDao: Dao;
+      let _updatedDao: Dao;
 
       if (updates.name !== undefined) {
         // Update task name
-        updatedDao = await taskService.updateTaskName(
+        _updatedDao = await taskService.updateTaskName(
           dao.id,
           taskId,
           updates.name,
         );
       } else {
         // Update other task properties
-        updatedDao = await taskService.updateTask(dao.id, taskId, {
-          progress: updates.progress,
+        _updatedDao = await taskService.updateTask(dao.id, taskId, {
+          progress:
+            typeof updates.progress === "number" ? updates.progress : undefined,
           comment: updates.comment,
           isApplicable: updates.isApplicable,
           assignedTo: updates.assignedTo,
@@ -385,7 +386,7 @@ export default function DaoDetail() {
     e.dataTransfer.setData("text/plain", taskId.toString());
   };
 
-  const handleDragEnd = (e: React.DragEvent) => {
+  const handleDragEnd = () => {
     setDraggedTaskId(null);
     setDragOverTaskId(null);
   };
@@ -395,7 +396,7 @@ export default function DaoDetail() {
     e.dataTransfer.dropEffect = "move";
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = () => {
     setDragOverTaskId(null);
   };
 
