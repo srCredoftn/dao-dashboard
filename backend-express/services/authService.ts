@@ -139,7 +139,7 @@ export class AuthService {
         throw new Error("JWT_SECRET is not configured");
       }
 
-      const token = jwt.sign(authUser, JWT_SECRET, {
+      const token = jwt.sign(authUser, JWT_SECRET as jwt.Secret, {
         expiresIn: JWT_EXPIRES_IN,
         issuer: "dao-management",
         audience: "dao-app",
