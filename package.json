@@ -12,7 +12,9 @@
   },
   "scripts": {
     "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
-    "dev:backend": "tsx backend-express/server.ts",
+    "dev:backend": "pnpm run dev:backend:mongo",
+    "dev:backend:express": "tsx backend-express/server.ts",
+    "dev:backend:mongo": "tsx watch backend-mongodb/src/index.ts",
     "dev:frontend": "vite",
     "dev:frontend-only": "vite",
     "build": "pnpm run build:client && pnpm run build:server",
