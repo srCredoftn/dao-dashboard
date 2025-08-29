@@ -271,48 +271,6 @@ export default function NewDaoDialog({
 
       await onCreateDao(newDao);
 
-      // Send notifications to team members
-      if (formData.teamLeader) {
-        const leaderUser = users.find((u) => u.id === formData.teamLeader?.id);
-        if (leaderUser) {
-          notificationService.notifyDaoAssignment(
-            {
-              id: leaderUser.id,
-              name: leaderUser.name,
-              email: leaderUser.email,
-              role: leaderUser.role,
-            },
-            newDao,
-            "chef_equipe",
-          );
-        }
-      }
-
-      formData.teamMembers.forEach((member) => {
-        const memberUser = users.find((u) => u.id === member.id);
-        if (memberUser) {
-          notificationService.notifyDaoAssignment(
-            {
-              id: memberUser.id,
-              name: memberUser.name,
-              email: memberUser.email,
-              role: memberUser.role,
-            },
-            newDao,
-            "membre_equipe",
-          );
-        }
-      });
-
-      if (process.env.NODE_ENV === "development") {
-        console.log(
-          `📧 Notifications envoyées pour le DAO ${newDao.numeroListe}:`,
-          {
-            chef: formData.teamLeader?.name,
-            membres: formData.teamMembers.map((m) => m.name),
-          },
-        );
-      }
 
       // Reset form only after successful creation
       setFormData({
@@ -487,7 +445,7 @@ export default function NewDaoDialog({
             <Label htmlFor="reference">Référence *</Label>
             <Input
               id="reference"
-              placeholder="Saisir la r��férence..."
+              placeholder="Saisir la référence..."
               value={formData.reference}
               onChange={(e) => handleFieldChange("reference", e.target.value)}
               required
