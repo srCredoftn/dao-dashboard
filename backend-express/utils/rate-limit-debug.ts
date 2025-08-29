@@ -126,9 +126,10 @@ export class RateLimitDebugger {
   static getDebugRoute() {
     return (req: Request, res: Response) => {
       if (process.env.NODE_ENV !== "development") {
-        return res
+        res
           .status(404)
           .json({ error: "Debug routes only available in development" });
+        return;
       }
 
       // Nettoyer les anciens enregistrements
