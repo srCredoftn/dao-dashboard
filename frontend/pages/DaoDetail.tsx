@@ -22,12 +22,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { devLog } from "@/utils/devLogger";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { apiService } from "@/services/api";
 import { taskService } from "@/services/taskService";
@@ -36,7 +30,6 @@ import {
   calculateDaoProgress,
   type Dao,
   type DaoTask,
-  type DaoStatus,
   type TeamMember,
 } from "@shared/dao";
 import TeamEditDialog from "@/components/TeamEditDialog";
@@ -168,7 +161,6 @@ export default function DaoDetail() {
   }
 
   const progress = calculateDaoProgress(dao.tasks);
-  const status = calculateDaoStatus(dao.dateDepot, progress);
 
   const handleTaskProgressChange = (
     taskId: number,
@@ -289,7 +281,6 @@ export default function DaoDetail() {
         };
       });
 
-      let _updatedDao: Dao;
 
       if (updates.name !== undefined) {
         // Update task name
