@@ -6,10 +6,6 @@ import {
   Download,
   Trash2,
   Edit3,
-  Users,
-  Calendar,
-  Building2,
-  FileSpreadsheet,
 } from "lucide-react";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 // jsPDF import dynamique pour réduire la taille du bundle initial
@@ -23,9 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { devLog } from "@/utils/devLogger";
 import {
@@ -46,7 +40,6 @@ import {
   type TeamMember,
 } from "@shared/dao";
 import TeamEditDialog from "@/components/TeamEditDialog";
-import TaskAssignmentDialog from "@/components/TaskAssignmentDialog";
 import TaskComments from "@/components/TaskComments";
 import TaskMenuButton from "@/components/TaskMenuButton";
 import AddTaskButton from "@/components/AddTaskButton";
