@@ -25,6 +25,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { authService } from "@/services/authService";
+import { useAuth } from "@/contexts/AuthContext";
 import { type TeamMember, type User } from "@shared/dao";
 
 // Helper function to determine if a user should be available for task assignment
@@ -68,6 +69,8 @@ export default function TaskAssignmentDialog({
   taskName,
   canManage = false,
 }: TaskAssignmentDialogProps) {
+  const { isAdmin } = useAuth();
+  const canAddMembers = isAdmin();
   const [open, setOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<string | undefined>(
     currentAssignedTo,
@@ -82,8 +85,9 @@ export default function TaskAssignmentDialog({
     setTempTeam(availableMembers);
   }, [availableMembers]);
 
-  // Fetch users when dialog opens and add member section is shown
+  // Fetch users when dialog opens and add member section is shown (admin only)
   useEffect(() => {
+    if (!canAddMembers) return;
     if (open && showAddMember && availableUsers.length === 0) {
       const fetchUsers = async () => {
         setIsLoadingUsers(true);
@@ -98,7 +102,7 @@ export default function TaskAssignmentDialog({
       };
       fetchUsers();
     }
-  }, [open, showAddMember, availableUsers.length]);
+  }, [open, showAddMember, availableUsers.length, canAddMembers]);
 
   // Filter to only show actual team members of this specific DAO
   const actualTeamMembers = tempTeam.filter(isValidTaskAssignee);
@@ -299,73 +303,75 @@ export default function TaskAssignmentDialog({
             </Select>
           </div>
 
-          {/* Add Team Member Section */}
-          <div className="border-t pt-4">
-            <Collapsible open={showAddMember} onOpenChange={setShowAddMember}>
-              <CollapsibleTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full">
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  {showAddMember ? "Masquer" : "Ajouter un membre à l'équipe"}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-3 mt-3">
-                {isLoadingUsers ? (
-                  <div className="text-center py-2 text-sm text-muted-foreground">
-                    Chargement des utilisateurs...
-                  </div>
-                ) : usersToAdd.length === 0 ? (
-                  <div className="text-center py-2 text-sm text-muted-foreground">
-                    Tous les utilisateurs sont déjà dans l'équipe
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">
-                      Utilisateurs disponibles
-                    </Label>
-                    <div className="max-h-32 overflow-y-auto space-y-1">
-                      {usersToAdd.map((user) => (
-                        <div
-                          key={user.id}
-                          className="flex items-center justify-between p-2 rounded border"
-                        >
-                          <div>
-                            <div className="font-medium text-sm">
-                              {user.name}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {user.email}
-                            </div>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() =>
-                                addMemberToTeam(user.id, "membre_equipe")
-                              }
-                              className="h-6 text-xs"
-                            >
-                              + Membre
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() =>
-                                addMemberToTeam(user.id, "chef_equipe")
-                              }
-                              className="h-6 text-xs"
-                            >
-                              + Chef
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
+          {/* Add Team Member Section (admin only) */}
+          {canAddMembers && (
+            <div className="border-t pt-4">
+              <Collapsible open={showAddMember} onOpenChange={setShowAddMember}>
+                <CollapsibleTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    {showAddMember ? "Masquer" : "Ajouter un membre à l'équipe"}
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-3 mt-3">
+                  {isLoadingUsers ? (
+                    <div className="text-center py-2 text-sm text-muted-foreground">
+                      Chargement des utilisateurs...
                     </div>
-                  </div>
-                )}
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
+                  ) : usersToAdd.length === 0 ? (
+                    <div className="text-center py-2 text-sm text-muted-foreground">
+                      Tous les utilisateurs sont déjà dans l'équipe
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">
+                        Utilisateurs disponibles
+                      </Label>
+                      <div className="max-h-32 overflow-y-auto space-y-1">
+                        {usersToAdd.map((user) => (
+                          <div
+                            key={user.id}
+                            className="flex items-center justify-between p-2 rounded border"
+                          >
+                            <div>
+                              <div className="font-medium text-sm">
+                                {user.name}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {user.email}
+                              </div>
+                            </div>
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  addMemberToTeam(user.id, "membre_equipe")
+                                }
+                                className="h-6 text-xs"
+                              >
+                                + Membre
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  addMemberToTeam(user.id, "chef_equipe")
+                                }
+                                className="h-6 text-xs"
+                              >
+                                + Chef
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
+          )}
 
           {/* Show added members */}
           {tempTeam.length > availableMembers.length && (
