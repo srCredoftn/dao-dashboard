@@ -90,8 +90,8 @@ class AuthApiService {
 
       console.log(`✅ Auth API success: ${url} (${response.status})`);
       return await response.json();
-    } catch (error) {
-      if (error.name === "AbortError") {
+    } catch (error: any) {
+      if (error?.name === "AbortError") {
         console.warn(`⏰ Request timeout for ${endpoint}`);
         throw new Error("La requête a pris trop de temps. Veuillez réessayer.");
       }

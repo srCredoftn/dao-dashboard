@@ -1,16 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  FileText,
-  Download,
-  Trash2,
-  Edit3,
-  Users,
-  Calendar,
-  Building2,
-  FileSpreadsheet,
-} from "lucide-react";
+import { ArrowLeft, FileText, Download, Trash2, Edit3 } from "lucide-react";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 // jsPDF import dynamique pour réduire la taille du bundle initial
 import { Button } from "@/components/ui/button";
@@ -23,51 +13,25 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { devLog } from "@/utils/devLogger";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { apiService } from "@/services/api";
 import { taskService } from "@/services/taskService";
 import {
-  calculateDaoStatus,
   calculateDaoProgress,
   type Dao,
   type DaoTask,
-  type DaoStatus,
   type TeamMember,
 } from "@shared/dao";
 import TeamEditDialog from "@/components/TeamEditDialog";
-import TaskAssignmentDialog from "@/components/TaskAssignmentDialog";
-import TaskComments from "@/components/TaskComments";
-import TaskMenuButton from "@/components/TaskMenuButton";
 import AddTaskButton from "@/components/AddTaskButton";
 import { TaskRow } from "@/components/TaskRow";
 import ExportFilterDialog, {
   type ExportOptions,
 } from "@/components/ExportFilterDialog";
 import { useAuth } from "@/contexts/AuthContext";
-
-function getStatusColor(status: DaoStatus): string {
-  switch (status) {
-    case "completed":
-      return "bg-dao-completed text-white";
-    case "urgent":
-      return "bg-dao-urgent text-white";
-    case "safe":
-      return "bg-dao-safe text-white";
-    case "default":
-      return "bg-dao-default text-white";
-  }
-}
 
 export default function DaoDetail() {
   const { id } = useParams<{ id: string }>();
@@ -189,7 +153,6 @@ export default function DaoDetail() {
   }
 
   const progress = calculateDaoProgress(dao.tasks);
-  const status = calculateDaoStatus(dao.dateDepot, progress);
 
   const handleTaskProgressChange = (
     taskId: number,
@@ -310,19 +273,14 @@ export default function DaoDetail() {
         };
       });
 
-      let updatedDao: Dao;
-
       if (updates.name !== undefined) {
         // Update task name
-        updatedDao = await taskService.updateTaskName(
-          dao.id,
-          taskId,
-          updates.name,
-        );
+        await taskService.updateTaskName(dao.id, taskId, updates.name);
       } else {
         // Update other task properties
-        updatedDao = await taskService.updateTask(dao.id, taskId, {
-          progress: updates.progress,
+        await taskService.updateTask(dao.id, taskId, {
+          progress:
+            typeof updates.progress === "number" ? updates.progress : undefined,
           comment: updates.comment,
           isApplicable: updates.isApplicable,
           assignedTo: updates.assignedTo,
@@ -406,7 +364,7 @@ export default function DaoDetail() {
     e.dataTransfer.setData("text/plain", taskId.toString());
   };
 
-  const handleDragEnd = (e: React.DragEvent) => {
+  const handleDragEnd = () => {
     setDraggedTaskId(null);
     setDragOverTaskId(null);
   };
@@ -416,7 +374,7 @@ export default function DaoDetail() {
     e.dataTransfer.dropEffect = "move";
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = () => {
     setDragOverTaskId(null);
   };
 
@@ -1090,7 +1048,6 @@ export default function DaoDetail() {
               {/* Add Task Button */}
               <AddTaskButton
                 onTaskAdd={handleTaskAdd}
-                existingTaskIds={dao.tasks.map((t) => t.id)}
                 canManage={
                   isAdmin() ||
                   dao.equipe.some(

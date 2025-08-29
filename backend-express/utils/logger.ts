@@ -183,20 +183,16 @@ export function requestLogger() {
 
     res.on("finish", () => {
       const duration = Date.now() - start;
-      const statusColor = res.statusCode >= 400 ? LogLevel.WARN : LogLevel.INFO;
+      const message = `${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`;
 
-      logger.log(
-        logger.createLogEntry(
-          statusColor,
-          `${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`,
-          "HTTP",
-          undefined,
-          req.user?.id,
-          req.ip,
-        ),
-      );
+      if (res.statusCode >= 500) {
+        logger.error(message, "HTTP", undefined, req.user?.id, req.ip);
+      } else if (res.statusCode >= 400) {
+        logger.warn(message, "HTTP", undefined, req.user?.id, req.ip);
+      } else {
+        logger.info(message, "HTTP", undefined, req.user?.id, req.ip);
+      }
 
-      // Log des erreurs avec plus de détails
       if (res.statusCode >= 400) {
         logger.security(
           `Failed request: ${req.method} ${req.originalUrl}`,

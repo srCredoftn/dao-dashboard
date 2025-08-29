@@ -1,4 +1,4 @@
-import type { Dao, DaoTask } from "@shared/dao";
+import type { Dao } from "@shared/dao";
 
 const API_BASE_URL = "/api/dao";
 
@@ -137,10 +137,7 @@ class TaskService {
   }
 
   // Reorder tasks
-  async reorderTasks(
-    daoId: string,
-    taskIds: number[],
-  ): Promise<Dao> {
+  async reorderTasks(daoId: string, taskIds: number[]): Promise<Dao> {
     return this.request<Dao>(`/${daoId}/tasks/reorder`, {
       method: "PUT",
       body: JSON.stringify({ taskIds }),

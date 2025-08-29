@@ -180,7 +180,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 
 // Hook pour reporter les erreurs de manière programmatique
 export function useErrorHandler() {
-  return (error: Error, errorInfo?: string) => {
+  return (error: Error, _errorInfo?: string) => {
     console.error("Error reported via hook:", error);
 
     // En production, envoyer à un service d'erreur

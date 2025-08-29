@@ -4,7 +4,6 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import TaskAssignmentDialog from "./TaskAssignmentDialog";
 import TaskComments from "./TaskComments";
 import TaskMenuButton from "./TaskMenuButton";

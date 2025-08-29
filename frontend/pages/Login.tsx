@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { authService } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,26 +50,6 @@ export default function Login() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const demoCredentials = [
-    { role: "Administrateur", email: "admin@2snd.fr", password: "admin123" },
-    {
-      role: "Utilisateur",
-      email: "marie.dubois@2snd.fr",
-      password: "marie123",
-    },
-    {
-      role: "Utilisateur",
-      email: "pierre.martin@2snd.fr",
-      password: "pierre123",
-    },
-  ];
-
-  const fillDemoCredentials = (email: string, password: string) => {
-    setEmail(email);
-    setPassword(password);
-    setError("");
   };
 
   return (

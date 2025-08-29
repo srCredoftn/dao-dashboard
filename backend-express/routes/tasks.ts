@@ -40,7 +40,7 @@ router.post(
 
       // Basic ID validation
       if (!daoId || daoId.length > 100) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid DAO ID",
           code: "INVALID_DAO_ID",
         });
@@ -50,7 +50,7 @@ router.post(
       const daoIndex = daoStorage.findIndexById(daoId);
 
       if (daoIndex === -1) {
-        return res.status(404).json({
+        return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
@@ -88,7 +88,7 @@ router.post(
       res.status(201).json(dao);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Validation error",
           details: error.errors.map((e) => ({
             field: e.path.join("."),
@@ -119,7 +119,7 @@ router.put(
 
       // Validate parameters
       if (!daoId || daoId.length > 100) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid DAO ID",
           code: "INVALID_DAO_ID",
         });
@@ -127,7 +127,7 @@ router.put(
 
       const parsedTaskId = parseInt(taskId);
       if (isNaN(parsedTaskId) || parsedTaskId < 1) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid task ID",
           code: "INVALID_TASK_ID",
         });
@@ -137,7 +137,7 @@ router.put(
       const daoIndex = daoStorage.findIndexById(daoId);
 
       if (daoIndex === -1) {
-        return res.status(404).json({
+        return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
@@ -147,7 +147,7 @@ router.put(
       const task = dao.tasks.find((t) => t.id === parsedTaskId);
 
       if (!task) {
-        return res.status(404).json({
+        return void res.status(404).json({
           error: "Task not found",
           code: "TASK_NOT_FOUND",
         });
@@ -169,7 +169,7 @@ router.put(
       res.json(dao);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Validation error",
           details: error.errors.map((e) => ({
             field: e.path.join("."),
@@ -200,7 +200,7 @@ router.delete(
 
       // Validate parameters
       if (!daoId || daoId.length > 100) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid DAO ID",
           code: "INVALID_DAO_ID",
         });
@@ -208,7 +208,7 @@ router.delete(
 
       const parsedTaskId = parseInt(taskId);
       if (isNaN(parsedTaskId) || parsedTaskId < 1) {
-        return res.status(400).json({
+        return void res.status(400).json({
           error: "Invalid task ID",
           code: "INVALID_TASK_ID",
         });
@@ -217,7 +217,7 @@ router.delete(
       const daoIndex = daoStorage.findIndexById(daoId);
 
       if (daoIndex === -1) {
-        return res.status(404).json({
+        return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
@@ -227,7 +227,7 @@ router.delete(
       const taskIndex = dao.tasks.findIndex((t) => t.id === parsedTaskId);
 
       if (taskIndex === -1) {
-        return res.status(404).json({
+        return void res.status(404).json({
           error: "Task not found",
           code: "TASK_NOT_FOUND",
         });

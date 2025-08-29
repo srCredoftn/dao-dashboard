@@ -1,8 +1,4 @@
-import {
-  calculateDaoProgress,
-  calculateDaoStatus,
-  DEFAULT_TASKS,
-} from "@shared/dao";
+import { calculateDaoProgress, calculateDaoStatus } from "@shared/dao";
 import type { Dao } from "@shared/dao";
 
 // Create test DAOs with known progress values

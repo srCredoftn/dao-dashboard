@@ -43,8 +43,8 @@ export function setupAuthDebug() {
         console.log("Token payload:", payload);
         console.log("Token expires:", new Date(payload.exp * 1000));
         console.log("Token expired:", Date.now() > payload.exp * 1000);
-      } catch (e) {
-        console.log("Could not decode token:", e.message);
+      } catch (e: any) {
+        console.log("Could not decode token:", e?.message || e);
       }
     }
   };

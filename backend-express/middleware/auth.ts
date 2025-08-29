@@ -25,7 +25,7 @@ export async function authenticate(
       console.log(
         `🚫 No token provided for ${req.method} ${req.originalUrl} from ${req.ip}`,
       );
-      return res.status(401).json({
+      return void res.status(401).json({
         error: "Access token required",
         code: "NO_TOKEN",
       });
@@ -37,7 +37,7 @@ export async function authenticate(
       console.log(
         `🚫 Empty token for ${req.method} ${req.originalUrl} from ${req.ip}`,
       );
-      return res.status(401).json({
+      return void res.status(401).json({
         error: "Access token required",
         code: "EMPTY_TOKEN",
       });
@@ -49,7 +49,7 @@ export async function authenticate(
       console.log(
         `🚫 Invalid token for ${req.method} ${req.originalUrl} from ${req.ip}`,
       );
-      return res.status(401).json({
+      return void res.status(401).json({
         error: "Invalid or expired token",
         code: "INVALID_TOKEN",
       });
@@ -59,7 +59,7 @@ export async function authenticate(
     next();
   } catch (error) {
     console.error("Authentication error:", error);
-    return res.status(401).json({
+    return void res.status(401).json({
       error: "Authentication failed",
       code: "AUTH_ERROR",
     });
@@ -73,7 +73,7 @@ export function authorize(roles: UserRole[]) {
       console.log(
         `🚫 No user context for ${req.method} ${req.originalUrl} from ${req.ip}`,
       );
-      return res.status(401).json({
+      return void res.status(401).json({
         error: "Authentication required",
         code: "NO_USER_CONTEXT",
       });
@@ -83,7 +83,7 @@ export function authorize(roles: UserRole[]) {
       console.log(
         `🚫 Insufficient permissions: ${req.user.email} (${req.user.role}) tried to access ${req.originalUrl}`,
       );
-      return res.status(403).json({
+      return void res.status(403).json({
         error: "Insufficient permissions",
         required: roles,
         current: req.user.role,
@@ -179,7 +179,7 @@ export function requireOwnership(
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({
+      return void res.status(401).json({
         error: "Authentication required",
         code: "NO_USER_CONTEXT",
       });
@@ -196,7 +196,7 @@ export function requireOwnership(
       console.log(
         `🚫 Ownership violation: ${req.user.email} tried to access resource owned by ${resourceUserId}`,
       );
-      return res.status(403).json({
+      return void res.status(403).json({
         error: "Can only access your own resources",
         code: "OWNERSHIP_VIOLATION",
       });
@@ -254,7 +254,7 @@ export function sensitiveOperationLimit() {
       console.log(
         `🚫 Rate limit exceeded for sensitive operation: ${req.user?.email || req.ip}`,
       );
-      return res.status(429).json({
+      return void res.status(429).json({
         error: "Too many attempts, please try again later",
         retryAfter: Math.ceil((userAttempts.resetTime - now) / 1000),
         code: "RATE_LIMITED",

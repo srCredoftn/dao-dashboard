@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { User, LogOut, Settings, Shield, Users, Menu, X } from "lucide-react";
+import { User, LogOut, Settings, Shield, Users, X } from "lucide-react";
 import NotificationCenter from "./NotificationCenter";
 
 interface AppHeaderProps {

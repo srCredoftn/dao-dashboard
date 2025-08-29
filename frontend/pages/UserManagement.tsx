@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   Users,
   Plus,
-  Edit,
   Trash2,
   Mail,
   Calendar,

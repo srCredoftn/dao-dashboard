@@ -88,8 +88,7 @@ export default function TaskComments({
             message: `${user.name} vous a mentionné dans un commentaire : "${newComment.slice(0, 50)}${newComment.length > 50 ? "..." : ""}"`,
             taskId,
             daoId,
-            fromUser: user.name,
-            priority: "high",
+            data: { fromUser: user.name, priority: "high" },
           });
         }
       }
@@ -97,13 +96,12 @@ export default function TaskComments({
       // General notification for new comment (excluding the author)
       if (availableMembers.length > 1) {
         addNotification({
-          type: "comment",
+          type: "task_update",
           title: `Nouveau commentaire sur ${taskName}`,
           message: `${user.name} a ajouté un commentaire : "${newComment.slice(0, 50)}${newComment.length > 50 ? "..." : ""}"`,
           taskId,
           daoId,
-          fromUser: user.name,
-          priority: "normal",
+          data: { fromUser: user.name, priority: "normal" },
         });
       }
 

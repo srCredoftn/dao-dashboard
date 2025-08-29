@@ -3,8 +3,6 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 import { AuthenticatedRoute, AdminRoute } from "./ProtectedRoute";
 import { LazyLoader, PageFallback, lazy } from "./LazyLoader";
 import NetworkStatusAlert from "./NetworkStatusAlert";
-import FetchDiagnostics from "./FetchDiagnostics";
-import FetchTestButton from "./FetchTestButton";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 

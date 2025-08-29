@@ -1,12 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Plus,
-  ChevronDown,
-  Calendar,
-  Users,
-  Building2,
-  FileText,
-} from "lucide-react";
+import { Plus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,7 +34,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import {
   DEFAULT_TASKS,
   type Dao,
@@ -50,17 +42,6 @@ import {
 } from "@shared/dao";
 import { apiService } from "@/services/api";
 import { authService } from "@/services/authService";
-import { notificationService } from "@/services/notificationService";
-
-const REFERENCE_TYPES = [
-  "AMI",
-  "AO",
-  "Appel d'offres",
-  "Marché public",
-  "Consultation",
-  "MAPA",
-  "DSP",
-];
 
 const SAMPLE_AUTHORITIES = [
   "Mairie de Lyon",
@@ -154,7 +135,6 @@ export default function NewDaoDialog({
 
   // Reference-related state variables removed as we now use a simple input
 
-  const [authorityOpen, setAuthorityOpen] = useState(false);
   const [customAuthority, setCustomAuthority] = useState("");
   const [isCustomAuthority, setIsCustomAuthority] = useState(false);
 
@@ -288,49 +268,6 @@ export default function NewDaoDialog({
       };
 
       await onCreateDao(newDao);
-
-      // Send notifications to team members
-      if (formData.teamLeader) {
-        const leaderUser = users.find((u) => u.id === formData.teamLeader?.id);
-        if (leaderUser) {
-          notificationService.notifyDaoAssignment(
-            {
-              id: leaderUser.id,
-              name: leaderUser.name,
-              email: leaderUser.email,
-              role: leaderUser.role,
-            },
-            newDao,
-            "chef_equipe",
-          );
-        }
-      }
-
-      formData.teamMembers.forEach((member) => {
-        const memberUser = users.find((u) => u.id === member.id);
-        if (memberUser) {
-          notificationService.notifyDaoAssignment(
-            {
-              id: memberUser.id,
-              name: memberUser.name,
-              email: memberUser.email,
-              role: memberUser.role,
-            },
-            newDao,
-            "membre_equipe",
-          );
-        }
-      });
-
-      if (process.env.NODE_ENV === "development") {
-        console.log(
-          `📧 Notifications envoyées pour le DAO ${newDao.numeroListe}:`,
-          {
-            chef: formData.teamLeader?.name,
-            membres: formData.teamMembers.map((m) => m.name),
-          },
-        );
-      }
 
       // Reset form only after successful creation
       setFormData({
