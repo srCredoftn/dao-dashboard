@@ -88,8 +88,7 @@ export default function TaskComments({
             message: `${user.name} vous a mentionné dans un commentaire : "${newComment.slice(0, 50)}${newComment.length > 50 ? "..." : ""}"`,
             taskId,
             daoId,
-            fromUser: user.name,
-            priority: "high",
+            data: { fromUser: user.name, priority: "high" },
           });
         }
       }
@@ -102,8 +101,7 @@ export default function TaskComments({
           message: `${user.name} a ajouté un commentaire : "${newComment.slice(0, 50)}${newComment.length > 50 ? "..." : ""}"`,
           taskId,
           daoId,
-          fromUser: user.name,
-          priority: "normal",
+          data: { fromUser: user.name, priority: "normal" },
         });
       }
 
