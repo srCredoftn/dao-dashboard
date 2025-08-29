@@ -1,6 +1,5 @@
 import express from "express";
 import { z } from "zod";
-import { daoStorage } from "../data/daoStorage";
 import {
   authenticate,
   requireAdmin,
@@ -11,6 +10,7 @@ import {
 import { devLog } from "../utils/devLog";
 import { DEFAULT_TASKS } from "@shared/dao";
 import type { Dao } from "@shared/dao";
+import { DaoService } from "../services/daoService";
 
 const router = express.Router();
 
@@ -54,33 +54,19 @@ const taskUpdateSchema = z.object({
   assignedTo: z.string().max(50).optional(),
 });
 
-// Using shared DAO storage service
-
-// Helper to generate new ID securely
-function generateId(): string {
-  return `dao_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-}
-
-// Input sanitization
+// Helper to sanitize string
 function sanitizeString(input: string): string {
-  return input.replace(/<[^>]*>/g, "").trim(); // Remove HTML tags
+  return input.replace(/<[^>]*>/g, "").trim();
 }
 
 // GET /api/dao - Get all DAOs (authenticated users only)
-router.get("/", authenticate, auditLog("VIEW_ALL_DAOS"), (req, res) => {
+router.get("/", authenticate, auditLog("VIEW_ALL_DAOS"), async (req, res) => {
   try {
-    // Filter sensitive data based on user role
-    let filteredDaos = daoStorage.getAll();
-
-    if (req.user?.role !== "admin") {
-      // Non-admin users might see limited data in the future
-      filteredDaos = daoStorage.getAll(); // For now, all users see all DAOs
-    }
-
+    const daos = await DaoService.getAllDaos();
     devLog.info(
-      `Serving ${filteredDaos.length} DAOs to ${req.user?.email} (${req.user?.role})`,
+      `Serving ${daos.length} DAOs to ${req.user?.email} (${req.user?.role})`,
     );
-    res.json(filteredDaos);
+    res.json(daos);
   } catch (error) {
     devLog.error("Error in GET /api/dao:", error);
     return void res.status(500).json({
@@ -91,52 +77,11 @@ router.get("/", authenticate, auditLog("VIEW_ALL_DAOS"), (req, res) => {
 });
 
 // GET /api/dao/next-number - Get next DAO number (authenticated users only)
-router.get("/next-number", authenticate, (req, res) => {
+router.get("/next-number", authenticate, async (req, res) => {
   try {
-    const year = new Date().getFullYear();
-
-    // Validate year is reasonable
-    if (year < 2020 || year > 2100) {
-      return void res.status(400).json({
-        error: "Invalid year",
-        code: "INVALID_YEAR",
-      });
-    }
-
-    // Filter DAOs for current year with safer regex
-    const currentYearDaos = daoStorage.filter((dao) => {
-      const match = dao.numeroListe.match(/^DAO-(\d{4})-(\d{3})$/);
-      return Boolean(match && parseInt(match[1], 10) === year);
-    });
-
-    if (currentYearDaos.length === 0) {
-      return void res.json({ nextNumber: `DAO-${year}-001` });
-    }
-
-    // Extract numbers safely
-    const numbers = currentYearDaos
-      .map((dao) => {
-        const match = dao.numeroListe.match(/^DAO-\d{4}-(\d{3})$/);
-        return match ? parseInt(match[1], 10) : 0;
-      })
-      .filter((num) => !isNaN(num) && num > 0);
-
-    const nextNumber = numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
-
-    // Validate next number is reasonable
-    if (nextNumber > 999) {
-      return void res.status(400).json({
-        error: "Too many DAOs for this year",
-        code: "YEAR_LIMIT_EXCEEDED",
-      });
-    }
-
-    const nextNumberString = `DAO-${year}-${nextNumber.toString().padStart(3, "0")}`;
-
-    console.log(
-      `🔢 Generated next DAO number: ${nextNumberString} for ${req.user?.email}`,
-    );
-    res.json({ nextNumber: nextNumberString });
+    const next = await DaoService.generateNextDaoNumber();
+    console.log(`🔢 Generated next DAO number: ${next} for ${req.user?.email}`);
+    res.json({ nextNumber: next });
   } catch (error) {
     console.error("Error in GET /api/dao/next-number:", error);
     res.status(500).json({
@@ -147,11 +92,10 @@ router.get("/next-number", authenticate, (req, res) => {
 });
 
 // GET /api/dao/:id - Get DAO by ID (authenticated users only)
-router.get("/:id", authenticate, (req, res) => {
+router.get("/:id", authenticate, async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Basic ID validation
     if (!id || id.length > 100) {
       return void res.status(400).json({
         error: "Invalid DAO ID",
@@ -159,7 +103,7 @@ router.get("/:id", authenticate, (req, res) => {
       });
     }
 
-    const dao = daoStorage.findById(id);
+    const dao = await DaoService.getDaoById(id);
     if (!dao) {
       return void res.status(404).json({
         error: "DAO not found",
@@ -185,30 +129,9 @@ router.post(
   requireAdmin,
   auditLog("CREATE_DAO"),
   sensitiveOperationLimit(),
-  (req, res) => {
+  async (req, res) => {
     try {
-      // Validate and sanitize input
       const validatedData = createDaoSchema.parse(req.body);
-
-      // Additional security checks
-      if (daoStorage.size() > 10000) {
-        return void res.status(400).json({
-          error: "Maximum number of DAOs reached",
-          code: "STORAGE_LIMIT",
-        });
-      }
-
-      // Check for duplicate numeroListe
-      const existingDao = daoStorage
-        .getAll()
-        .find((dao) => dao.numeroListe === validatedData.numeroListe);
-
-      if (existingDao) {
-        return void res.status(400).json({
-          error: "DAO number already exists",
-          code: "DUPLICATE_NUMBER",
-        });
-      }
 
       // Sanitize string fields
       const sanitizedData = {
@@ -225,32 +148,40 @@ router.post(
         })),
       };
 
-      const id = generateId();
       const now = new Date().toISOString();
+      const tasks = (validatedData.tasks && validatedData.tasks.length
+        ? validatedData.tasks
+        : DEFAULT_TASKS.map((task) => ({
+            ...task,
+            progress: null,
+            comment: "",
+          }))
+      ).map((t, idx) => ({
+        id: typeof t.id === "number" ? t.id : idx + 1,
+        name: sanitizeString(t.name),
+        progress: t.isApplicable ? t.progress ?? null : null,
+        comment: t.comment ? sanitizeString(t.comment) : undefined,
+        isApplicable: t.isApplicable,
+        assignedTo: t.assignedTo,
+        lastUpdatedBy: req.user!.id,
+        lastUpdatedAt: now,
+      }));
 
-      // Use provided tasks or default tasks
-      const tasks =
-        validatedData.tasks ||
-        DEFAULT_TASKS.map((task) => ({
-          ...task,
-          progress: null,
-          comment: "",
-        }));
-
-      const newDao: Dao = {
-        ...sanitizedData,
-        id,
+      const newDao = await DaoService.createDao({
+        numeroListe: sanitizedData.numeroListe,
+        objetDossier: sanitizedData.objetDossier,
+        reference: sanitizedData.reference,
+        autoriteContractante: sanitizedData.autoriteContractante,
+        dateDepot: sanitizedData.dateDepot,
+        equipe: sanitizedData.equipe,
         tasks,
-        createdAt: now,
-        updatedAt: now,
-      };
+      });
 
-      daoStorage.add(newDao);
       console.log(
         `✨ Created new DAO: ${newDao.numeroListe} by ${req.user?.email}`,
       );
       res.status(201).json(newDao);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         return void res.status(400).json({
           error: "Validation error",
@@ -259,6 +190,12 @@ router.post(
             message: e.message,
           })),
           code: "VALIDATION_ERROR",
+        });
+      }
+      if (error?.code === 11000) {
+        return void res.status(400).json({
+          error: "DAO number already exists",
+          code: "DUPLICATE_NUMBER",
         });
       }
 
@@ -277,11 +214,10 @@ router.put(
   authenticate,
   requireDaoLeaderOrAdmin("id"),
   auditLog("UPDATE_DAO"),
-  (req, res) => {
+  async (req, res) => {
     try {
       const { id } = req.params;
 
-      // Basic ID validation
       if (!id || id.length > 100) {
         return void res.status(400).json({
           error: "Invalid DAO ID",
@@ -290,70 +226,36 @@ router.put(
       }
 
       const validatedData = updateDaoSchema.parse(req.body);
-      const index = daoStorage.findIndexById(id);
 
-      if (index === -1) {
-        return void res.status(404).json({
-          error: "DAO not found",
-          code: "DAO_NOT_FOUND",
-        });
-      }
-
-      // Check for duplicate numeroListe if being updated
-      if (validatedData.numeroListe) {
-        const existingDao = daoStorage
-          .getAll()
-          .find(
-            (dao) =>
-              dao.id !== id && dao.numeroListe === validatedData.numeroListe,
-          );
-
-        if (existingDao) {
-          return void res.status(400).json({
-            error: "DAO number already exists",
-            code: "DUPLICATE_NUMBER",
-          });
-        }
-      }
-
-      // Sanitize string fields
-      const sanitizedUpdates: any = { ...validatedData };
-      if (validatedData.numeroListe) {
-        sanitizedUpdates.numeroListe = sanitizeString(
-          validatedData.numeroListe,
-        );
-      }
-      if (validatedData.objetDossier) {
-        sanitizedUpdates.objetDossier = sanitizeString(
-          validatedData.objetDossier,
-        );
-      }
-      if (validatedData.reference) {
-        sanitizedUpdates.reference = sanitizeString(validatedData.reference);
-      }
-      if (validatedData.autoriteContractante) {
-        sanitizedUpdates.autoriteContractante = sanitizeString(
+      // Sanitize updates
+      const updates: Partial<Dao> = {};
+      if (validatedData.numeroListe)
+        updates.numeroListe = sanitizeString(validatedData.numeroListe);
+      if (validatedData.objetDossier)
+        updates.objetDossier = sanitizeString(validatedData.objetDossier);
+      if (validatedData.reference)
+        updates.reference = sanitizeString(validatedData.reference);
+      if (validatedData.autoriteContractante)
+        updates.autoriteContractante = sanitizeString(
           validatedData.autoriteContractante,
         );
-      }
-      if (validatedData.equipe) {
-        sanitizedUpdates.equipe = validatedData.equipe.map((member) => ({
-          ...member,
-          name: sanitizeString(member.name),
+      if (validatedData.equipe)
+        updates.equipe = validatedData.equipe.map((m) => ({
+          ...m,
+          name: sanitizeString(m.name),
         }));
+      if (validatedData.tasks) updates.tasks = validatedData.tasks as any;
+
+      const updated = await DaoService.updateDao(id, updates);
+      if (!updated) {
+        return void res
+          .status(404)
+          .json({ error: "DAO not found", code: "DAO_NOT_FOUND" });
       }
 
-      const currentDao = daoStorage.getAll()[index];
-      const updatedDao = {
-        ...currentDao,
-        ...sanitizedUpdates,
-        updatedAt: new Date().toISOString(),
-      };
-
-      daoStorage.updateAtIndex(index, updatedDao);
       console.log(`📝 Updated DAO: ${id} by ${req.user?.email}`);
-      res.json(updatedDao);
-    } catch (error) {
+      res.json(updated);
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         return void res.status(400).json({
           error: "Validation error",
@@ -362,6 +264,12 @@ router.put(
             message: e.message,
           })),
           code: "VALIDATION_ERROR",
+        });
+      }
+      if (error?.code === 11000) {
+        return void res.status(400).json({
+          error: "DAO number already exists",
+          code: "DUPLICATE_NUMBER",
         });
       }
 
@@ -381,11 +289,10 @@ router.delete(
   requireAdmin,
   auditLog("DELETE_DAO"),
   sensitiveOperationLimit(),
-  (req, res) => {
+  async (req, res) => {
     try {
       const { id } = req.params;
 
-      // Basic ID validation
       if (!id || id.length > 100) {
         return void res.status(400).json({
           error: "Invalid DAO ID",
@@ -393,24 +300,17 @@ router.delete(
         });
       }
 
-      const index = daoStorage.findIndexById(id);
-
-      if (index === -1) {
+      const deleted = await DaoService.deleteDao(id);
+      if (!deleted) {
         return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
       }
 
-      const deletedDao = daoStorage.getAll()[index];
-      daoStorage.deleteById(id);
-
-      console.log(
-        `🗑️ Deleted DAO: ${id} (${deletedDao.numeroListe}) by ${req.user?.email}`,
-      );
+      console.log(`🗑️ Deleted DAO: ${id} by ${req.user?.email}`);
       res.json({
         message: "DAO deleted successfully",
-        deletedDao: { id: deletedDao.id, numeroListe: deletedDao.numeroListe },
       });
     } catch (error) {
       console.error("Error in DELETE /api/dao/:id:", error);
@@ -428,12 +328,11 @@ router.put(
   authenticate,
   requireDaoLeaderOrAdmin("id"),
   auditLog("REORDER_TASKS"),
-  (req, res) => {
+  async (req, res) => {
     try {
       const { id } = req.params;
-      const { taskIds } = req.body;
+      const { taskIds } = req.body as { taskIds: number[] };
 
-      // Validate parameters
       if (!id || id.length > 100) {
         return void res.status(400).json({
           error: "Invalid DAO ID",
@@ -448,20 +347,16 @@ router.put(
         });
       }
 
-      const daoIndex = daoStorage.findIndexById(id);
-      if (daoIndex === -1) {
+      const dao = await DaoService.getDaoById(id);
+      if (!dao) {
         return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
       }
 
-      const dao = daoStorage.findById(id)!;
-
-      // Validate that all provided task IDs exist in the DAO
       const existingTaskIds = dao.tasks.map((t) => t.id);
-      const invalidIds = taskIds.filter((id) => !existingTaskIds.includes(id));
-
+      const invalidIds = taskIds.filter((tid) => !existingTaskIds.includes(tid));
       if (invalidIds.length > 0) {
         return void res.status(400).json({
           error: "Some task IDs do not exist",
@@ -470,10 +365,9 @@ router.put(
         });
       }
 
-      // Validate that all existing tasks are included in the reorder
       if (
         taskIds.length !== dao.tasks.length ||
-        !existingTaskIds.every((id) => taskIds.includes(id))
+        !existingTaskIds.every((tid) => taskIds.includes(tid))
       ) {
         return void res.status(400).json({
           error: "Task IDs must include all existing tasks",
@@ -481,19 +375,16 @@ router.put(
         });
       }
 
-      // Reorder tasks according to the provided order
       const reorderedTasks = taskIds.map(
         (taskId) => dao.tasks.find((task) => task.id === taskId)!,
       );
 
-      dao.tasks = reorderedTasks;
-      dao.updatedAt = new Date().toISOString();
-
-      // Update the DAO in storage
-      daoStorage.updateAtIndex(daoIndex, dao);
+      const updated = await DaoService.updateDao(id, {
+        tasks: reorderedTasks,
+      });
 
       console.log(`🔄 Reordered tasks in DAO ${id} by ${req.user?.email}`);
-      res.json(dao);
+      res.json(updated);
     } catch (error) {
       console.error("Error in PUT /api/dao/:id/tasks/reorder:", error);
       res.status(500).json({
@@ -510,11 +401,10 @@ router.put(
   authenticate,
   requireDaoLeaderOrAdmin("id"),
   auditLog("UPDATE_TASK"),
-  (req, res) => {
+  async (req, res) => {
     try {
       const { id, taskId } = req.params;
 
-      // Validate parameters
       if (!id || id.length > 100) {
         return void res.status(400).json({
           error: "Invalid DAO ID",
@@ -531,18 +421,16 @@ router.put(
       }
 
       const validatedData = taskUpdateSchema.parse(req.body);
-      const daoIndex = daoStorage.findIndexById(id);
 
-      if (daoIndex === -1) {
+      const dao = await DaoService.getDaoById(id);
+      if (!dao) {
         return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
       }
 
-      const dao = daoStorage.findById(id)!;
       const task = dao.tasks.find((t) => t.id === parsedTaskId);
-
       if (!task) {
         return void res.status(404).json({
           error: "Task not found",
@@ -550,7 +438,6 @@ router.put(
         });
       }
 
-      // Update task fields safely
       if (typeof validatedData.progress === "number") {
         task.progress = validatedData.progress;
       }
@@ -566,15 +453,13 @@ router.put(
 
       task.lastUpdatedBy = req.user!.id;
       task.lastUpdatedAt = new Date().toISOString();
-      dao.updatedAt = new Date().toISOString();
 
-      // Update the DAO in storage
-      daoStorage.updateAtIndex(daoIndex, dao);
+      const updated = await DaoService.updateDao(id, { tasks: dao.tasks });
 
       console.log(
         `📋 Updated task ${parsedTaskId} in DAO ${id} by ${req.user?.email}`,
       );
-      res.json(dao);
+      res.json(updated);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return void res.status(400).json({

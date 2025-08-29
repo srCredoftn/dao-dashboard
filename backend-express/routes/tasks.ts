@@ -1,12 +1,12 @@
 import express from "express";
 import { z } from "zod";
-import { daoStorage } from "../data/daoStorage";
 import {
   authenticate,
   requireDaoLeaderOrAdmin,
   auditLog,
 } from "../middleware/auth";
 import type { DaoTask } from "@shared/dao";
+import { DaoService } from "../services/daoService";
 
 const router = express.Router();
 
@@ -28,17 +28,16 @@ function sanitizeString(input: string): string {
   return input.replace(/<[^>]*>/g, "").trim();
 }
 
-// POST /api/dao/:daoId/tasks - Add new task (admin only)
+// POST /api/dao/:daoId/tasks - Add new task (admin or DAO leader)
 router.post(
   "/:daoId/tasks",
   authenticate,
   requireDaoLeaderOrAdmin("daoId"),
   auditLog("ADD_TASK"),
-  (req, res) => {
+  async (req, res) => {
     try {
       const { daoId } = req.params;
 
-      // Basic ID validation
       if (!daoId || daoId.length > 100) {
         return void res.status(400).json({
           error: "Invalid DAO ID",
@@ -47,22 +46,18 @@ router.post(
       }
 
       const validatedData = createTaskSchema.parse(req.body);
-      const daoIndex = daoStorage.findIndexById(daoId);
+      const dao = await DaoService.getDaoById(daoId);
 
-      if (daoIndex === -1) {
+      if (!dao) {
         return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
       }
 
-      const dao = daoStorage.findById(daoId)!;
-
-      // Generate new task ID
       const existingIds = dao.tasks.map((t) => t.id);
       const newId = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
 
-      // Sanitize and create new task
       const newTask: DaoTask = {
         id: newId,
         name: sanitizeString(validatedData.name),
@@ -74,18 +69,16 @@ router.post(
         assignedTo: validatedData.assignedTo,
         lastUpdatedBy: req.user!.id,
         lastUpdatedAt: new Date().toISOString(),
-      };
+      } as DaoTask;
 
-      dao.tasks.push(newTask);
-      dao.updatedAt = new Date().toISOString();
-
-      // Update the DAO in storage
-      daoStorage.updateAtIndex(daoIndex, dao);
+      const updated = await DaoService.updateDao(daoId, {
+        tasks: [...dao.tasks, newTask],
+      });
 
       console.log(
         `✨ Added new task "${newTask.name}" to DAO ${daoId} by ${req.user?.email}`,
       );
-      res.status(201).json(dao);
+      res.status(201).json(updated);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return void res.status(400).json({
@@ -107,17 +100,16 @@ router.post(
   },
 );
 
-// PUT /api/dao/:daoId/tasks/:taskId/name - Update task name (admin only)
+// PUT /api/dao/:daoId/tasks/:taskId/name - Update task name (admin or DAO leader)
 router.put(
   "/:daoId/tasks/:taskId/name",
   authenticate,
   requireDaoLeaderOrAdmin("daoId"),
   auditLog("UPDATE_TASK_NAME"),
-  (req, res) => {
+  async (req, res) => {
     try {
       const { daoId, taskId } = req.params;
 
-      // Validate parameters
       if (!daoId || daoId.length > 100) {
         return void res.status(400).json({
           error: "Invalid DAO ID",
@@ -134,18 +126,16 @@ router.put(
       }
 
       const validatedData = updateTaskNameSchema.parse(req.body);
-      const daoIndex = daoStorage.findIndexById(daoId);
+      const dao = await DaoService.getDaoById(daoId);
 
-      if (daoIndex === -1) {
+      if (!dao) {
         return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
       }
 
-      const dao = daoStorage.findById(daoId)!;
       const task = dao.tasks.find((t) => t.id === parsedTaskId);
-
       if (!task) {
         return void res.status(404).json({
           error: "Task not found",
@@ -153,20 +143,17 @@ router.put(
         });
       }
 
-      // Update task name
       const oldName = task.name;
       task.name = sanitizeString(validatedData.name);
       task.lastUpdatedBy = req.user!.id;
       task.lastUpdatedAt = new Date().toISOString();
-      dao.updatedAt = new Date().toISOString();
 
-      // Update the DAO in storage
-      daoStorage.updateAtIndex(daoIndex, dao);
+      const updated = await DaoService.updateDao(daoId, { tasks: dao.tasks });
 
       console.log(
         `📝 Updated task name from "${oldName}" to "${task.name}" in DAO ${daoId} by ${req.user?.email}`,
       );
-      res.json(dao);
+      res.json(updated);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return void res.status(400).json({
@@ -188,17 +175,16 @@ router.put(
   },
 );
 
-// DELETE /api/dao/:daoId/tasks/:taskId - Delete task (admin only)
+// DELETE /api/dao/:daoId/tasks/:taskId - Delete task (admin or DAO leader)
 router.delete(
   "/:daoId/tasks/:taskId",
   authenticate,
   requireDaoLeaderOrAdmin("daoId"),
   auditLog("DELETE_TASK"),
-  (req, res) => {
+  async (req, res) => {
     try {
       const { daoId, taskId } = req.params;
 
-      // Validate parameters
       if (!daoId || daoId.length > 100) {
         return void res.status(400).json({
           error: "Invalid DAO ID",
@@ -214,18 +200,15 @@ router.delete(
         });
       }
 
-      const daoIndex = daoStorage.findIndexById(daoId);
-
-      if (daoIndex === -1) {
+      const dao = await DaoService.getDaoById(daoId);
+      if (!dao) {
         return void res.status(404).json({
           error: "DAO not found",
           code: "DAO_NOT_FOUND",
         });
       }
 
-      const dao = daoStorage.findById(daoId)!;
       const taskIndex = dao.tasks.findIndex((t) => t.id === parsedTaskId);
-
       if (taskIndex === -1) {
         return void res.status(404).json({
           error: "Task not found",
@@ -235,10 +218,8 @@ router.delete(
 
       const deletedTask = dao.tasks[taskIndex];
       dao.tasks.splice(taskIndex, 1);
-      dao.updatedAt = new Date().toISOString();
 
-      // Update the DAO in storage
-      daoStorage.updateAtIndex(daoIndex, dao);
+      const updated = await DaoService.updateDao(daoId, { tasks: dao.tasks });
 
       console.log(
         `🗑️ Deleted task "${deletedTask.name}" from DAO ${daoId} by ${req.user?.email}`,
@@ -246,7 +227,7 @@ router.delete(
       res.json({
         message: "Task deleted successfully",
         deletedTask: { id: deletedTask.id, name: deletedTask.name },
-        dao: dao,
+        dao: updated,
       });
     } catch (error) {
       console.error("Error in DELETE /api/dao/:daoId/tasks/:taskId:", error);

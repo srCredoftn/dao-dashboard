@@ -15,7 +15,6 @@
     "dev:auto": "node scripts/dev-auto.mjs",
     "dev:backend": "pnpm run dev:backend:express",
     "dev:backend:express": "tsx backend-express/server.ts",
-    "dev:backend:mongo": "cd backend-mongodb && pnpm install && pnpm dev",
     "dev:frontend": "vite",
     "dev:frontend-only": "vite",
     "build": "pnpm run build:client && pnpm run build:server",
@@ -30,8 +29,7 @@
     "lint": "eslint frontend backend-express shared --ext .ts,.tsx",
     "audit:security": "pnpm audit",
     "update:deps": "pnpm update",
-    "env:generate": "node scripts/generate-env.mjs",
-    "db:queries": "tsx backend-mongodb/src/scripts/db-queries.ts"
+    "env:generate": "node scripts/generate-env.mjs"
   },
   "dependencies": {
     "@types/mongoose": "^5.11.97",
