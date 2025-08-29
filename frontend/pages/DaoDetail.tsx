@@ -1091,6 +1091,7 @@ export default function DaoDetail() {
               <AddTaskButton
                 onTaskAdd={handleTaskAdd}
                 existingTaskIds={dao.tasks.map((t) => t.id)}
+                canManage={isAdmin() || dao.equipe.some((m) => m.id === user?.id && m.role === "chef_equipe")}
               />
             </div>
 
