@@ -10,17 +10,19 @@ interface AddTaskButtonProps {
     newTask: Omit<DaoTask, "id" | "lastUpdatedAt" | "lastUpdatedBy">,
   ) => void;
   existingTaskIds: number[];
+  canManage?: boolean;
 }
 
 export default function AddTaskButton({
   onTaskAdd,
   existingTaskIds,
+  canManage = false,
 }: AddTaskButtonProps) {
   const { isAdmin } = useAuth();
   const [showDialog, setShowDialog] = useState(false);
 
-  // Only show for admin users
-  if (!isAdmin()) {
+  // Show for admin or manager (team lead)
+  if (!isAdmin() && !canManage) {
     return null;
   }
 
