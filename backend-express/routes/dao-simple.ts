@@ -3,10 +3,10 @@ import { z } from "zod";
 import { daoStorage } from "../data/daoStorage";
 import {
   authenticate,
-  requireUser,
   requireAdmin,
   auditLog,
   sensitiveOperationLimit,
+  requireDaoLeaderOrAdmin,
 } from "../middleware/auth";
 import { devLog } from "../utils/devLog";
 import { DEFAULT_TASKS } from "@shared/dao";
@@ -275,7 +275,7 @@ router.post(
 router.put(
   "/:id",
   authenticate,
-  requireUser,
+  requireDaoLeaderOrAdmin("id"),
   auditLog("UPDATE_DAO"),
   (req, res) => {
     try {
@@ -426,7 +426,7 @@ router.delete(
 router.put(
   "/:id/tasks/reorder",
   authenticate,
-  requireUser,
+  requireDaoLeaderOrAdmin("id"),
   auditLog("REORDER_TASKS"),
   (req, res) => {
     try {
@@ -508,7 +508,7 @@ router.put(
 router.put(
   "/:id/tasks/:taskId",
   authenticate,
-  requireUser,
+  requireDaoLeaderOrAdmin("id"),
   auditLog("UPDATE_TASK"),
   (req, res) => {
     try {
