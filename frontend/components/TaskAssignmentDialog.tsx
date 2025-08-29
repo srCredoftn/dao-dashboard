@@ -34,7 +34,7 @@ const isValidTaskAssignee = (member: TeamMember): boolean => {
   // Exclude system/admin users unless they were explicitly added as team members
   return (
     (member.role === "chef_equipe" || member.role === "membre_equipe") &&
-    member.email &&
+    Boolean(member.email) &&
     // Exclude admin users that weren't explicitly added to this DAO team
     // Admin users should only appear if they were specifically selected during DAO creation
     !member.name.startsWith("Admin ")
