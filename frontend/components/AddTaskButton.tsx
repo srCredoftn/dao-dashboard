@@ -27,9 +27,6 @@ export default function AddTaskButton({
   }
 
   const handleAddTask = (taskData: Partial<DaoTask>) => {
-    // Generate new unique task ID
-    const newId = Math.max(...existingTaskIds, 0) + 1;
-
     const newTask: Omit<DaoTask, "id" | "lastUpdatedAt" | "lastUpdatedBy"> = {
       name: taskData.name!,
       progress: taskData.isApplicable ? taskData.progress || null : null,
