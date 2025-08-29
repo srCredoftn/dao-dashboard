@@ -46,6 +46,7 @@ interface TaskAssignmentDialogProps {
   onAssignmentChange: (memberId?: string) => void;
   onTeamUpdate?: (newTeam: TeamMember[]) => void;
   taskName: string;
+  canManage?: boolean;
 }
 
 // Helper function to convert User to TeamMember
@@ -65,6 +66,7 @@ export default function TaskAssignmentDialog({
   onAssignmentChange,
   onTeamUpdate,
   taskName,
+  canManage = false,
 }: TaskAssignmentDialogProps) {
   const [open, setOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<string | undefined>(
@@ -185,6 +187,17 @@ export default function TaskAssignmentDialog({
   const currentMember = actualTeamMembers.find(
     (m) => m.id === currentAssignedTo,
   );
+
+  // Read-only view if user cannot manage assignments
+  if (!canManage) {
+    return currentMember ? (
+      <span className="inline-flex items-center rounded-md border border-input bg-yellow-100 px-2.5 py-0.5 text-xs font-semibold text-yellow-800">
+        {currentMember.name}
+      </span>
+    ) : (
+      <span className="text-xs text-muted-foreground">Non assigné</span>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
