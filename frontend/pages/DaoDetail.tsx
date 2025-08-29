@@ -47,18 +47,6 @@ import ExportFilterDialog, {
 } from "@/components/ExportFilterDialog";
 import { useAuth } from "@/contexts/AuthContext";
 
-function getStatusColor(status: DaoStatus): string {
-  switch (status) {
-    case "completed":
-      return "bg-dao-completed text-white";
-    case "urgent":
-      return "bg-dao-urgent text-white";
-    case "safe":
-      return "bg-dao-safe text-white";
-    case "default":
-      return "bg-dao-default text-white";
-  }
-}
 
 export default function DaoDetail() {
   const { id } = useParams<{ id: string }>();
