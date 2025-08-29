@@ -54,6 +54,7 @@ export function TaskRow({
   onDrop,
 }: TaskRowProps) {
   const { user, isAdmin } = useAuth();
+  const canManage = isAdmin() || availableMembers.some((m) => m.id === user?.id && m.role === "chef_equipe");
   const [isEditing, setIsEditing] = useState(false);
   const [tempProgress, setTempProgress] = useState(task.progress || 0);
   const [tempComment, setTempComment] = useState(task.comment || "");
