@@ -1,12 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Plus,
-  ChevronDown,
-  Calendar,
-  Users,
-  Building2,
-  FileText,
-} from "lucide-react";
+import { Plus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,7 +34,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import {
   DEFAULT_TASKS,
   type Dao,
@@ -52,15 +44,6 @@ import { apiService } from "@/services/api";
 import { authService } from "@/services/authService";
 import { notificationService } from "@/services/notificationService";
 
-const REFERENCE_TYPES = [
-  "AMI",
-  "AO",
-  "Appel d'offres",
-  "Marché public",
-  "Consultation",
-  "MAPA",
-  "DSP",
-];
 
 const SAMPLE_AUTHORITIES = [
   "Mairie de Lyon",
@@ -154,7 +137,6 @@ export default function NewDaoDialog({
 
   // Reference-related state variables removed as we now use a simple input
 
-  const [authorityOpen, setAuthorityOpen] = useState(false);
   const [customAuthority, setCustomAuthority] = useState("");
   const [isCustomAuthority, setIsCustomAuthority] = useState(false);
 
@@ -505,7 +487,7 @@ export default function NewDaoDialog({
             <Label htmlFor="reference">Référence *</Label>
             <Input
               id="reference"
-              placeholder="Saisir la référence..."
+              placeholder="Saisir la r��férence..."
               value={formData.reference}
               onChange={(e) => handleFieldChange("reference", e.target.value)}
               required
