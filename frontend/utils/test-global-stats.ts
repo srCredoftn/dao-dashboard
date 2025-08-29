@@ -1,7 +1,6 @@
 import {
   calculateDaoProgress,
   calculateDaoStatus,
-  DEFAULT_TASKS,
 } from "@shared/dao";
 import type { Dao } from "@shared/dao";
 
