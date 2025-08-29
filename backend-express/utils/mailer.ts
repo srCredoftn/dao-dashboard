@@ -58,7 +58,6 @@ async function createTransporter(): Promise<Transporter> {
     // eslint-disable-next-line no-console
     console.warn("⚠️ Failed to create Ethereal test account. Emails will be logged only.");
     return {
-      // @ts-expect-error partial implementation for logging-only fallback
       sendMail: async (options: any) => {
         // eslint-disable-next-line no-console
         console.log("✉️ [LOG-ONLY EMAIL]", {
@@ -68,7 +67,6 @@ async function createTransporter(): Promise<Transporter> {
         });
         return { messageId: "log-only", envelope: {}, accepted: [], rejected: [] };
       },
-      // @ts-expect-error not used elsewhere
       verify: async () => true,
     } as Transporter;
   }
