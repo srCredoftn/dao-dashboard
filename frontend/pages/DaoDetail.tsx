@@ -26,7 +26,6 @@ import { cn } from "@/lib/utils";
 import { apiService } from "@/services/api";
 import { taskService } from "@/services/taskService";
 import {
-  calculateDaoStatus,
   calculateDaoProgress,
   type Dao,
   type DaoTask,
