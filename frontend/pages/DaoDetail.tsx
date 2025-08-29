@@ -40,8 +40,6 @@ import {
   type TeamMember,
 } from "@shared/dao";
 import TeamEditDialog from "@/components/TeamEditDialog";
-import TaskComments from "@/components/TaskComments";
-import TaskMenuButton from "@/components/TaskMenuButton";
 import AddTaskButton from "@/components/AddTaskButton";
 import { TaskRow } from "@/components/TaskRow";
 import ExportFilterDialog, {
