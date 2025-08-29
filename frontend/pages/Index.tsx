@@ -91,7 +91,7 @@ function getStatusLabel(status: DaoStatus): string {
 }
 
 /* removed unused DaoCard */
-function DaoCard_removed({ dao }: { dao: Dao }) {
+export function DaoCard_removed({ dao }: { dao: Dao }) {
   const progress = calculateDaoProgress(dao.tasks);
   const status = calculateDaoStatus(dao.dateDepot, progress);
   const navigate = useNavigate();
