@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Bell, BellDot, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Popover,
