@@ -15,7 +15,7 @@
     "dev:auto": "node scripts/dev-auto.mjs",
     "dev:backend": "pnpm run dev:backend:express",
     "dev:backend:express": "tsx backend-express/server.ts",
-      "dev:frontend": "vite",
+    "dev:frontend": "vite",
     "dev:frontend-only": "vite",
     "build": "pnpm run build:client && pnpm run build:server",
     "build:client": "vite build",
@@ -29,7 +29,8 @@
     "lint": "eslint frontend backend-express shared --ext .ts,.tsx",
     "audit:security": "pnpm audit",
     "update:deps": "pnpm update",
-    "env:generate": "node scripts/generate-env.mjs"  },
+    "env:generate": "node scripts/generate-env.mjs"
+  },
   "dependencies": {
     "@types/mongoose": "^5.11.97",
     "bcryptjs": "^3.0.2",
