@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Bell, BellDot, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Popover,
@@ -10,7 +11,7 @@ import {
 import { useNotifications } from "@/contexts/NotificationContext";
 
 export default function NotificationCenter() {
-  const { notifications, unreadCount, markAsRead, removeNotification } =
+  const { notifications, unreadCount, removeNotification } =
     useNotifications();
   const [isOpen, setIsOpen] = useState(false);
 
