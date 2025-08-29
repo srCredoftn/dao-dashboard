@@ -96,7 +96,7 @@ export default function TaskComments({
       // General notification for new comment (excluding the author)
       if (availableMembers.length > 1) {
         addNotification({
-          type: "comment",
+          type: "task_update",
           title: `Nouveau commentaire sur ${taskName}`,
           message: `${user.name} a ajouté un commentaire : "${newComment.slice(0, 50)}${newComment.length > 50 ? "..." : ""}"`,
           taskId,
