@@ -102,18 +102,24 @@ export const requireAdmin = authorize(["admin"]);
 export function requireDaoLeaderOrAdmin(paramKey: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ error: "Authentication required", code: "NO_USER_CONTEXT" });
+      return res
+        .status(401)
+        .json({ error: "Authentication required", code: "NO_USER_CONTEXT" });
     }
     // Admin passes immediately
     if (req.user.role === "admin") return next();
 
     const daoId = req.params[paramKey];
     if (!daoId) {
-      return res.status(400).json({ error: "DAO ID missing", code: "MISSING_DAO_ID" });
+      return res
+        .status(400)
+        .json({ error: "DAO ID missing", code: "MISSING_DAO_ID" });
     }
     const dao = daoStorage.findById(daoId);
     if (!dao) {
-      return res.status(404).json({ error: "DAO not found", code: "DAO_NOT_FOUND" });
+      return res
+        .status(404)
+        .json({ error: "DAO not found", code: "DAO_NOT_FOUND" });
     }
 
     const isLeader = dao.equipe.some(
@@ -121,7 +127,9 @@ export function requireDaoLeaderOrAdmin(paramKey: string) {
     );
 
     if (!isLeader) {
-      return res.status(403).json({ error: "Insufficient permissions", code: "NOT_LEADER" });
+      return res
+        .status(403)
+        .json({ error: "Insufficient permissions", code: "NOT_LEADER" });
     }
 
     next();

@@ -429,8 +429,8 @@ export default function DaoDetail() {
 
     try {
       // Find current positions
-      const draggedIndex = dao.tasks.findIndex(t => t.id === draggedTaskId);
-      const targetIndex = dao.tasks.findIndex(t => t.id === targetTaskId);
+      const draggedIndex = dao.tasks.findIndex((t) => t.id === draggedTaskId);
+      const targetIndex = dao.tasks.findIndex((t) => t.id === targetTaskId);
 
       if (draggedIndex === -1 || targetIndex === -1) {
         return;
@@ -442,10 +442,10 @@ export default function DaoDetail() {
       newTasks.splice(targetIndex, 0, movedTask);
 
       // Update local state immediately for better UX
-      setDao(prev => prev ? { ...prev, tasks: newTasks } : prev);
+      setDao((prev) => (prev ? { ...prev, tasks: newTasks } : prev));
 
       // Send reorder request to backend
-      const taskIds = newTasks.map(task => task.id);
+      const taskIds = newTasks.map((task) => task.id);
       const updatedDao = await taskService.reorderTasks(dao.id, taskIds);
       setDao(updatedDao);
 
@@ -1091,7 +1091,12 @@ export default function DaoDetail() {
               <AddTaskButton
                 onTaskAdd={handleTaskAdd}
                 existingTaskIds={dao.tasks.map((t) => t.id)}
-                canManage={isAdmin() || dao.equipe.some((m) => m.id === user?.id && m.role === "chef_equipe")}
+                canManage={
+                  isAdmin() ||
+                  dao.equipe.some(
+                    (m) => m.id === user?.id && m.role === "chef_equipe",
+                  )
+                }
               />
             </div>
 

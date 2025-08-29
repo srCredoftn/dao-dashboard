@@ -14,7 +14,8 @@ import mongoose from "mongoose";
 import { DaoModel } from "../models/Dao.js";
 import { UserModel } from "../models/User.js";
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/dao-management";
+const MONGODB_URI =
+  process.env.MONGODB_URI || "mongodb://localhost:27017/dao-management";
 
 async function connect() {
   if (mongoose.connection.readyState === 0) {
@@ -46,7 +47,9 @@ export async function findDaoByNumero(numeroListe: string) {
 export async function listDaosForYear(year: number) {
   await connect();
   const re = new RegExp(`^DAO-${year}-\\d{3}$`);
-  const daos = await DaoModel.find({ numeroListe: re }).sort({ createdAt: -1 }).lean();
+  const daos = await DaoModel.find({ numeroListe: re })
+    .sort({ createdAt: -1 })
+    .lean();
   console.log(`📅 DAOs for ${year}:`, daos.length);
   return daos;
 }
@@ -57,16 +60,40 @@ export async function createDao(input: {
   reference: string;
   autoriteContractante: string;
   dateDepot: string; // ISO string
-  equipe: { id: string; name: string; role: "chef_equipe" | "membre_equipe"; email?: string }[];
-  tasks: { id: number; name: string; isApplicable: boolean; progress?: number | null; comment?: string; assignedTo?: string }[];
+  equipe: {
+    id: string;
+    name: string;
+    role: "chef_equipe" | "membre_equipe";
+    email?: string;
+  }[];
+  tasks: {
+    id: number;
+    name: string;
+    isApplicable: boolean;
+    progress?: number | null;
+    comment?: string;
+    assignedTo?: string;
+  }[];
 }) {
   await connect();
-  const dao = await DaoModel.create({ ...input, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+  const dao = await DaoModel.create({
+    ...input,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
   console.log("✨ Created DAO:", dao.numeroListe);
   return dao.toJSON();
 }
 
-export async function updateDao(numeroListe: string, updates: Partial<{ objetDossier: string; reference: string; autoriteContractante: string; dateDepot: string }>) {
+export async function updateDao(
+  numeroListe: string,
+  updates: Partial<{
+    objetDossier: string;
+    reference: string;
+    autoriteContractante: string;
+    dateDepot: string;
+  }>,
+) {
   await connect();
   const dao = await DaoModel.findOneAndUpdate(
     { numeroListe },
@@ -118,7 +145,10 @@ export async function assignmentsForUser(memberId: string) {
 // ----- USERS & CONNECTIONS -----
 export async function listUsers() {
   await connect();
-  const users = await UserModel.find().select("-password").sort({ createdAt: -1 }).lean();
+  const users = await UserModel.find()
+    .select("-password")
+    .sort({ createdAt: -1 })
+    .lean();
   console.log("👥 Users:", users.length);
   return users;
 }

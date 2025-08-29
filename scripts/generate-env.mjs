@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
-import { randomBytes } from 'node:crypto';
-import { join, dirname } from 'node:path';
+import { writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { join, dirname } from "node:path";
 
 function ensureDir(file) {
   const dir = dirname(file);
@@ -9,21 +9,21 @@ function ensureDir(file) {
 }
 
 function genSecret(bytes = 48) {
-  return randomBytes(bytes).toString('hex');
+  return randomBytes(bytes).toString("hex");
 }
 
 function writeEnv(filePath, lines) {
   ensureDir(filePath);
   if (!existsSync(filePath)) {
-    writeFileSync(filePath, lines.join('\n') + '\n', { encoding: 'utf8' });
+    writeFileSync(filePath, lines.join("\n") + "\n", { encoding: "utf8" });
     console.log(`✅ Created ${filePath}`);
   } else {
     console.log(`ℹ️  Skipped, exists: ${filePath}`);
   }
 }
 
-const rootEnv = join(process.cwd(), '.env');
-const mongoEnv = join(process.cwd(), 'backend-mongodb/.env');
+const rootEnv = join(process.cwd(), ".env");
+const mongoEnv = join(process.cwd(), "backend-mongodb/.env");
 
 const jwt1 = genSecret();
 const jwt2 = genSecret();

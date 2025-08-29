@@ -1,7 +1,11 @@
 import express from "express";
 import { z } from "zod";
 import { daoStorage } from "../data/daoStorage";
-import { authenticate, requireDaoLeaderOrAdmin, auditLog } from "../middleware/auth";
+import {
+  authenticate,
+  requireDaoLeaderOrAdmin,
+  auditLog,
+} from "../middleware/auth";
 import type { DaoTask } from "@shared/dao";
 
 const router = express.Router();

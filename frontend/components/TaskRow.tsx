@@ -54,7 +54,9 @@ export function TaskRow({
   onDrop,
 }: TaskRowProps) {
   const { user, isAdmin } = useAuth();
-  const canManage = isAdmin() || availableMembers.some((m) => m.id === user?.id && m.role === "chef_equipe");
+  const canManage =
+    isAdmin() ||
+    availableMembers.some((m) => m.id === user?.id && m.role === "chef_equipe");
   const [isEditing, setIsEditing] = useState(false);
   const [tempProgress, setTempProgress] = useState(task.progress || 0);
   const [tempComment, setTempComment] = useState(task.comment || "");
@@ -220,8 +222,8 @@ export function TaskRow({
   return (
     <div
       ref={dragRef}
-        draggable={canManage}
-        onDragStart={handleDragStart}
+      draggable={canManage}
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
