@@ -20,7 +20,7 @@ export class RateLimitDebugger {
   static trackRateLimit() {
     return (req: Request, res: Response, next: Function) => {
       if (process.env.NODE_ENV === "development") {
-        const key = `${req.ip}:${req.originalUrl}`;
+        const key = `${String(req.ip)}:${req.originalUrl}`;
         const rateLimitHeaders = {
           limit: res.get("X-RateLimit-Limit"),
           remaining: res.get("X-RateLimit-Remaining"),
@@ -29,7 +29,7 @@ export class RateLimitDebugger {
 
         if (rateLimitHeaders.limit) {
           rateLimitTracker.set(key, {
-            ip: req.ip,
+            ip: String(req.ip),
             userId: (req as any).user?.id,
             endpoint: req.originalUrl,
             attempts:
@@ -136,7 +136,7 @@ export class RateLimitDebugger {
       this.cleanup();
 
       const allInfo = this.getAllRateLimitInfo();
-      const userIP = req.ip;
+      const userIP = String(req.ip);
       const userInfo = this.getRateLimitInfo(userIP);
 
       res.json({
