@@ -17,6 +17,8 @@ import userRoutes from "./routes/user.js";
 dotenv.config();
 
 const app = express();
+// Trust proxy (fix express-rate-limit behind proxies)
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB
