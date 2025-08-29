@@ -367,6 +367,7 @@ export function TaskRow({
                 onAssignmentChange(task.id, memberId)
               }
               taskName={task.name}
+              canManage={canManage}
             />
           </div>
 
@@ -400,20 +401,9 @@ export function TaskRow({
                 onAssignmentChange(task.id, memberId)
               }
               taskName={task.name}
+              canManage={canManage}
             />
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setIsEditing(true)}
-              className="text-xs"
-            >
-              Modifier
-            </Button>
-          </div>
-
-          {/* Action Buttons (Desktop) */}
-          <div className="hidden sm:flex items-center justify-between pt-2 border-t border-gray-100">
-            <div className="flex items-center gap-2">
+            {canManage && (
               <Button
                 size="sm"
                 variant="outline"
@@ -422,6 +412,22 @@ export function TaskRow({
               >
                 Modifier
               </Button>
+            )}
+          </div>
+
+          {/* Action Buttons (Desktop) */}
+          <div className="hidden sm:flex items-center justify-between pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-2">
+              {canManage && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
+                  className="text-xs"
+                >
+                  Modifier
+                </Button>
+              )}
             </div>
             <TaskMenuButton
               task={task}
