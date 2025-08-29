@@ -14,7 +14,6 @@ interface AddTaskButtonProps {
 
 export default function AddTaskButton({
   onTaskAdd,
-  existingTaskIds,
   canManage = false,
 }: AddTaskButtonProps) {
   const { isAdmin } = useAuth();
