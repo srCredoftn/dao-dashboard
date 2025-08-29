@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useState } from "react";
 import { FileText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { type DaoTask, type DaoStatus } from "@shared/dao";
+import { type DaoTask } from "@shared/dao";
 
 type ExportFormat = "PDF" | "CSV";
 
