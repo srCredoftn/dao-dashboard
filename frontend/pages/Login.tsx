@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { authService } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -96,7 +95,7 @@ export default function Login() {
           <CardHeader>
             <CardTitle>Connexion</CardTitle>
             <CardDescription>
-              Saisissez vos identifiants pour accéder à la plateforme
+              Saisissez vos identifiants pour accéder �� la plateforme
             </CardDescription>
           </CardHeader>
 
