@@ -9,13 +9,13 @@ export const serverMockDaos = [
     dateDepot: "2025-08-20",
     equipe: [
       {
-        id: "1",
+        id: "2",
         name: "Marie Dubois",
         role: "chef_equipe" as const,
         email: "marie.dubois@2snd.fr",
       },
       {
-        id: "2",
+        id: "3",
         name: "Pierre Martin",
         role: "membre_equipe" as const,
         email: "pierre.martin@2snd.fr",
@@ -27,9 +27,9 @@ export const serverMockDaos = [
         name: "Résumé sommaire DAO et Création du drive",
         progress: 100,
         isApplicable: true,
-        assignedTo: "1",
+        assignedTo: "2",
         comment: "",
-        lastUpdatedBy: "1",
+        lastUpdatedBy: "2",
         lastUpdatedAt: new Date().toISOString(),
       },
       {
@@ -37,9 +37,9 @@ export const serverMockDaos = [
         name: "Demande de caution et garanties",
         progress: 75,
         isApplicable: true,
-        assignedTo: "2",
+        assignedTo: "3",
         comment: "",
-        lastUpdatedBy: "1",
+        lastUpdatedBy: "2",
         lastUpdatedAt: new Date().toISOString(),
       },
       {
@@ -133,13 +133,13 @@ export const serverMockDaos = [
     dateDepot: "2025-08-10",
     equipe: [
       {
-        id: "4",
+        id: "5",
         name: "Jean Moreau",
         role: "chef_equipe" as const,
         email: "jean.moreau@2snd.fr",
       },
       {
-        id: "3",
+        id: "6",
         name: "Sophie Laurent",
         role: "membre_equipe" as const,
         email: "sophie.laurent@2snd.fr",
@@ -245,13 +245,13 @@ export const serverMockDaos = [
     dateDepot: "2025-08-18",
     equipe: [
       {
-        id: "1",
+        id: "2",
         name: "Marie Dubois",
         role: "chef_equipe" as const,
         email: "marie.dubois@2snd.fr",
       },
       {
-        id: "3",
+        id: "6",
         name: "Sophie Laurent",
         role: "membre_equipe" as const,
         email: "sophie.laurent@2snd.fr",
@@ -362,7 +362,7 @@ export const serverMockDaos = [
     dateDepot: "2025-08-17",
     equipe: [
       {
-        id: "2",
+        id: "3",
         name: "Pierre Martin",
         role: "chef_equipe" as const,
         email: "pierre.martin@2snd.fr",

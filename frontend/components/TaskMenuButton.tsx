@@ -16,19 +16,21 @@ interface TaskMenuButtonProps {
   task: DaoTask;
   onTaskUpdate: (taskId: number, updates: Partial<DaoTask>) => void;
   onTaskDelete: (taskId: number) => void;
+  canManage?: boolean;
 }
 
 export default function TaskMenuButton({
   task,
   onTaskUpdate,
   onTaskDelete,
+  canManage = false,
 }: TaskMenuButtonProps) {
   const { isAdmin } = useAuth();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Only show for admin users
-  if (!isAdmin()) {
+  // Show for admin or manager (team lead)
+  if (!isAdmin() && !canManage) {
     return null;
   }
 

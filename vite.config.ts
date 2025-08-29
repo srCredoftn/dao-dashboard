@@ -2,6 +2,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
+const backendTarget = process.env.BACKEND_URL || "http://localhost:3001";
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -14,7 +16,7 @@ export default defineConfig({
     port: 8080,
     proxy: {
       "/api": {
-        target: "http://localhost:3001", // Express backend port
+        target: backendTarget,
         changeOrigin: true,
         secure: false,
       },

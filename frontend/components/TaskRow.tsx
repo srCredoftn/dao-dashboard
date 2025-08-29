@@ -54,6 +54,9 @@ export function TaskRow({
   onDrop,
 }: TaskRowProps) {
   const { user, isAdmin } = useAuth();
+  const canManage =
+    isAdmin() ||
+    availableMembers.some((m) => m.id === user?.id && m.role === "chef_equipe");
   const [isEditing, setIsEditing] = useState(false);
   const [tempProgress, setTempProgress] = useState(task.progress || 0);
   const [tempComment, setTempComment] = useState(task.comment || "");
@@ -135,7 +138,7 @@ export function TaskRow({
     return (
       <div
         ref={dragRef}
-        draggable={isAdmin()}
+        draggable={canManage}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
@@ -143,7 +146,7 @@ export function TaskRow({
         onDrop={handleDrop}
         className={cn(
           "bg-white rounded-lg border p-3 sm:p-4 transition-all duration-200",
-          isAdmin() && "hover:cursor-move",
+          canManage && "hover:cursor-move",
           isDragging && "opacity-50 transform rotate-1",
           isDragOver && "border-blue-500 bg-blue-50",
         )}
@@ -162,7 +165,7 @@ export function TaskRow({
           <div className="flex items-center justify-between pt-2 border-t border-gray-100">
             <span className="text-xs text-muted-foreground">Applicable:</span>
             <div className="flex items-center gap-2">
-              {isAdmin() ? (
+              {canManage ? (
                 <Switch
                   checked={task.isApplicable}
                   onCheckedChange={(checked) =>
@@ -193,7 +196,7 @@ export function TaskRow({
             </h4>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">Applicable:</span>
-              {isAdmin() ? (
+              {canManage ? (
                 <Switch
                   checked={task.isApplicable}
                   onCheckedChange={(checked) =>
@@ -219,7 +222,7 @@ export function TaskRow({
   return (
     <div
       ref={dragRef}
-      draggable={isAdmin()}
+      draggable={canManage}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
@@ -227,7 +230,7 @@ export function TaskRow({
       onDrop={handleDrop}
       className={cn(
         "bg-white rounded-lg border p-3 sm:p-4 transition-all duration-200",
-        isAdmin() && "hover:cursor-move",
+        canManage && "hover:cursor-move",
         isDragging && "opacity-50 transform rotate-1 shadow-lg",
         isDragOver && "border-blue-500 bg-blue-50",
       )}
@@ -246,7 +249,7 @@ export function TaskRow({
         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
           <span className="text-xs text-muted-foreground">Applicable:</span>
           <div className="flex items-center gap-2">
-            {isAdmin() ? (
+            {canManage ? (
               <Switch
                 checked={task.isApplicable}
                 onCheckedChange={(checked) =>
@@ -277,7 +280,7 @@ export function TaskRow({
           <div className="flex items-center gap-3 ml-4">
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">Applicable:</span>
-              {isAdmin() ? (
+              {canManage ? (
                 <Switch
                   checked={task.isApplicable}
                   onCheckedChange={(checked) =>
@@ -366,6 +369,7 @@ export function TaskRow({
                 onAssignmentChange(task.id, memberId)
               }
               taskName={task.name}
+              canManage={canManage}
             />
           </div>
 
@@ -399,20 +403,9 @@ export function TaskRow({
                 onAssignmentChange(task.id, memberId)
               }
               taskName={task.name}
+              canManage={canManage}
             />
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setIsEditing(true)}
-              className="text-xs"
-            >
-              Modifier
-            </Button>
-          </div>
-
-          {/* Action Buttons (Desktop) */}
-          <div className="hidden sm:flex items-center justify-between pt-2 border-t border-gray-100">
-            <div className="flex items-center gap-2">
+            {canManage && (
               <Button
                 size="sm"
                 variant="outline"
@@ -421,11 +414,28 @@ export function TaskRow({
               >
                 Modifier
               </Button>
+            )}
+          </div>
+
+          {/* Action Buttons (Desktop) */}
+          <div className="hidden sm:flex items-center justify-between pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-2">
+              {canManage && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
+                  className="text-xs"
+                >
+                  Modifier
+                </Button>
+              )}
             </div>
             <TaskMenuButton
               task={task}
               onTaskUpdate={onTaskUpdate}
               onTaskDelete={onTaskDelete}
+              canManage={canManage}
             />
           </div>
 

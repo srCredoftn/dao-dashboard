@@ -17,6 +17,8 @@ import userRoutes from "./routes/user.js";
 dotenv.config();
 
 const app = express();
+// Trust proxy (fix express-rate-limit behind proxies)
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB
@@ -49,8 +51,15 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // Logging middleware
 app.use(logger);
 
-// Health check endpoint
+// Health check endpoints
 app.get("/health", (req, res) => {
+  res.json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+app.get("/api/health", (req, res) => {
   res.json({
     status: "OK",
     timestamp: new Date().toISOString(),
@@ -63,8 +72,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/dao", daoRoutes);
 app.use("/api/users", userRoutes);
 
-// 404 handler
-app.use("*", (req, res) => {
+// 404 handler (Express v5: no wildcard string)
+app.use((req, res) => {
   res.status(404).json({
     error: "Route not found",
     path: req.originalUrl,
