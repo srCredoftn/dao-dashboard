@@ -9,7 +9,6 @@ interface AddTaskButtonProps {
   onTaskAdd: (
     newTask: Omit<DaoTask, "id" | "lastUpdatedAt" | "lastUpdatedBy">,
   ) => void;
-  existingTaskIds: number[];
   canManage?: boolean;
 }
 
