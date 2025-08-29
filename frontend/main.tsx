@@ -12,7 +12,7 @@ let root: ReturnType<typeof createRoot> | null = null;
 
 function renderApp() {
   if (!root) {
-    root = createRoot(rootElement);
+    root = createRoot(rootElement as HTMLElement);
   }
   root.render(<App />);
 }
