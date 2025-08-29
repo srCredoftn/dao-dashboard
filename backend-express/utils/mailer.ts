@@ -10,7 +10,9 @@ function getBooleanEnv(name: string, def: boolean): boolean {
 
 async function createTransporter(): Promise<Transporter> {
   const host = process.env.SMTP_HOST;
-  const port = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
+  const port = process.env.SMTP_PORT
+    ? Number(process.env.SMTP_PORT)
+    : undefined;
   const secure = process.env.SMTP_SECURE
     ? getBooleanEnv("SMTP_SECURE", false)
     : port === 465; // default secure for 465
@@ -32,7 +34,10 @@ async function createTransporter(): Promise<Transporter> {
       console.log("📮 SMTP transporter ready (configured host)");
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.warn("⚠️ SMTP verify failed, emails may not send:", (e as Error).message);
+      console.warn(
+        "⚠️ SMTP verify failed, emails may not send:",
+        (e as Error).message,
+      );
     }
 
     return transporter;
@@ -51,12 +56,16 @@ async function createTransporter(): Promise<Transporter> {
       },
     });
     // eslint-disable-next-line no-console
-    console.log("🧪 Using Ethereal test SMTP account. Preview emails via logged URL.");
+    console.log(
+      "🧪 Using Ethereal test SMTP account. Preview emails via logged URL.",
+    );
     return transporter;
   } catch (e) {
     // As last resort, create a stub transporter that resolves without sending to avoid runtime crashes
     // eslint-disable-next-line no-console
-    console.warn("⚠️ Failed to create Ethereal test account. Emails will be logged only.");
+    console.warn(
+      "⚠️ Failed to create Ethereal test account. Emails will be logged only.",
+    );
     return {
       sendMail: async (options: any) => {
         // eslint-disable-next-line no-console
@@ -65,7 +74,12 @@ async function createTransporter(): Promise<Transporter> {
           subject: options.subject,
           text: options.text,
         });
-        return { messageId: "log-only", envelope: {}, accepted: [], rejected: [] };
+        return {
+          messageId: "log-only",
+          envelope: {},
+          accepted: [],
+          rejected: [],
+        };
       },
       verify: async () => true,
     } as Transporter;
