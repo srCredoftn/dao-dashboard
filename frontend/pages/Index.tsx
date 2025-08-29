@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDebounce, useStableCallback } from "@/hooks/use-performance";
+import { useDebounce } from "@/hooks/use-performance";
 import {
   Search,
   Calendar,
@@ -90,7 +90,8 @@ function getStatusLabel(status: DaoStatus): string {
   }
 }
 
-function DaoCard({ dao }: { dao: Dao }) {
+/* removed unused DaoCard */
+function DaoCard_removed({ dao }: { dao: Dao }) {
   const progress = calculateDaoProgress(dao.tasks);
   const status = calculateDaoStatus(dao.dateDepot, progress);
   const navigate = useNavigate();
@@ -280,7 +281,7 @@ export default function Index() {
   const [filters, setFilters] = useState<DaoFilters>({});
 
   // Debounce search term for performance
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  useDebounce(searchTerm, 300);
   const { user, isAdmin } = useAuth();
 
   // Load DAOs from API
