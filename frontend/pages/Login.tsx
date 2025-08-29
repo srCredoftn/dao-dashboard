@@ -52,25 +52,6 @@ export default function Login() {
     }
   };
 
-  const demoCredentials = [
-    { role: "Administrateur", email: "admin@2snd.fr", password: "admin123" },
-    {
-      role: "Utilisateur",
-      email: "marie.dubois@2snd.fr",
-      password: "marie123",
-    },
-    {
-      role: "Utilisateur",
-      email: "pierre.martin@2snd.fr",
-      password: "pierre123",
-    },
-  ];
-
-  const fillDemoCredentials = (email: string, password: string) => {
-    setEmail(email);
-    setPassword(password);
-    setError("");
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -95,7 +76,7 @@ export default function Login() {
           <CardHeader>
             <CardTitle>Connexion</CardTitle>
             <CardDescription>
-              Saisissez vos identifiants pour accéder �� la plateforme
+              Saisissez vos identifiants pour accéder à la plateforme
             </CardDescription>
           </CardHeader>
 
