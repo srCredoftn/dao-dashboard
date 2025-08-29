@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { type TeamMember, type User } from "@shared/dao";
 import { authService } from "@/services/authService";
 import { useEffect } from "react";
