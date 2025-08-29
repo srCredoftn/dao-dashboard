@@ -1,7 +1,7 @@
 import express from "express";
 import { z } from "zod";
 import { daoStorage } from "../data/daoStorage";
-import { authenticate, requireAdmin, auditLog } from "../middleware/auth";
+import { authenticate, requireDaoLeaderOrAdmin, auditLog } from "../middleware/auth";
 import type { DaoTask } from "@shared/dao";
 
 const router = express.Router();
@@ -28,7 +28,7 @@ function sanitizeString(input: string): string {
 router.post(
   "/:daoId/tasks",
   authenticate,
-  requireAdmin,
+  requireDaoLeaderOrAdmin("daoId"),
   auditLog("ADD_TASK"),
   (req, res) => {
     try {
@@ -107,7 +107,7 @@ router.post(
 router.put(
   "/:daoId/tasks/:taskId/name",
   authenticate,
-  requireAdmin,
+  requireDaoLeaderOrAdmin("daoId"),
   auditLog("UPDATE_TASK_NAME"),
   (req, res) => {
     try {
@@ -188,7 +188,7 @@ router.put(
 router.delete(
   "/:daoId/tasks/:taskId",
   authenticate,
-  requireAdmin,
+  requireDaoLeaderOrAdmin("daoId"),
   auditLog("DELETE_TASK"),
   (req, res) => {
     try {
