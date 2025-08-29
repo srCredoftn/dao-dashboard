@@ -284,14 +284,14 @@ export default function DaoDetail() {
 
       if (updates.name !== undefined) {
         // Update task name
-        _updatedDao = await taskService.updateTaskName(
+        await taskService.updateTaskName(
           dao.id,
           taskId,
           updates.name,
         );
       } else {
         // Update other task properties
-        _updatedDao = await taskService.updateTask(dao.id, taskId, {
+        await taskService.updateTask(dao.id, taskId, {
           progress:
             typeof updates.progress === "number" ? updates.progress : undefined,
           comment: updates.comment,
